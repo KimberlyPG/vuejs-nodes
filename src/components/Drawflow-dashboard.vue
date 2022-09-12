@@ -17,6 +17,7 @@
     import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
+    import NodeAssign from './Node-assign.vue'
     // import { useStore } from 'vuex'
 
     export default {
@@ -33,26 +34,32 @@
                     name: 'Addition',
                     item: 'addition',
                     input:2,
-                    output:0,
+                    output:1,
                 },
                 {
                     name: 'Subtraction',
                     item: 'subtraction',
                     input:2,
-                    output:0,
+                    output:1,
                 },
                 {
                     name: 'Multiplication',
                     item: 'multiplication',
                     input:2,
-                    output:0,
+                    output:1,
                 },
                 {
                     name: 'Division',
                     item: 'division',
                     input:2,
-                    output:0,
+                    output:1,
                 },
+                {
+                    name: 'Assign',
+                    item: 'assign',
+                    input: 1,
+                    output: 0
+                }
             ])
 
         const editor = shallowRef({})
@@ -114,60 +121,43 @@
             let num1 = 0
             let num2 = 0
             // registering nodes to the editor
-            editor.value.registerNode('number', <NodeNumber />, {}, {});
+            editor.value.registerNode('number', <NodeNumber title='addition' />, {}, {});
             editor.value.registerNode('addition', <NodeOperation title='addition' />, {}, {}); 
             editor.value.registerNode('subtraction', <NodeOperation title='subtraction' />, {}, {}); 
             editor.value.registerNode('multiplication', <NodeOperation title='multiplication' />, {}, {}); 
             editor.value.registerNode('division', <NodeOperation title='division' />, {}, {});
+            editor.value.registerNode('assign', <NodeAssign />, {}, {});
 
             editor.value.on('connectionCreated', (data) => {
-                // const output_id = editor.value.getNodeFromId(data.output_id).id
                 const output = editor.value.getNodeFromId(data.output_id)
                 console.log("output", output)
-
-                
-                // const outputNodeId = output.id;
-                const outputNumber = parseInt(output.data.number);
-                
+                const outputNumber = parseInt(output.data.number);       
                 const output_input = output.outputs.output_1.connections[0].output;
                 
                 const inputData = editor.value.getNodeFromId(data.input_id)
                 console.log("inputData", inputData)
-
                 const nodeName = inputData.name;
-                console.log("name", nodeName);
 
-                // let inputNode1 = 0
-                // let inputNode2 = 0
-                // if(inputData.inputs.input_1.connections[0] !== undefined) {
-                //     inputNode1 = inputData.inputs.input_1.connections[0].node
-                // }
-
-                // if(inputData.inputs.input_2.connections[0] !== undefined) {
-                //     inputNode2 = inputData.inputs.input_2.connections[0].node
-                // }
-
-                if(output_input == 'input_1'){
-                    // if(inputData.data.inputNode1 == inputData.inputs.input_1.connections[0].node || inputData.id <= 3) {
-                        // num2 = 0
-                        num1 = outputNumber
-                    // } 
+                
+                if(output_input == 'input_1'){              
+                    num1 = outputNumber
                 }
                 else if(output_input == 'input_2'){
-                    // if(inputData.data.inputNode2 == inputData.inputs.input_2.connections[0].node || inputData.id <= 3) {
-                        // num1 = 0
-                        num2 = outputNumber
-                    // }
+                    num2 = outputNumber
                 }
-
+                
                 let result = operationValues(num1, num2, nodeName)
-                // operationValues(num1, num2);
+                console.log("result", result)
                 const objectOperation = {
                     result: result
                 }
+                
+                // if(nodeName == 'assign') {
+                //     const assignData = inputData.data.assign;
+                //     console.log("assign", assignData + "" + result)
+                // }
 
                 const operationValue = editor.value
-
                 const input_id = editor.value.getNodeFromId(data.input_id).id
                 operationValue.updateNodeDataFromId(input_id, objectOperation)
             })
