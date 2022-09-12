@@ -14,34 +14,33 @@
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css'
-    import { h, getCurrentInstance, render, readonly, onMounted } from 'vue'
+    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
     import NodeNumber from './Node-number.vue'
+    import NodeOperation from './Node-operation.vue'
 
     export default {
         name: 'DrawflowDashboard',
         setup() {
             const nodesList = readonly([
                 {
-                    name: 'Number',
+                    name: 'NodeNumber',
                     item: 'NodeNumber',
                     input:0,
-                    output:1
+                    output:1,
                 },
                 {
-                    name: 'Add',
-                    item: 'NodeAdd',
-                    input:1,
-                    output:0
+                    name: 'NodeOperation',
+                    item: 'NodeOperation',
+                    input:2,
+                    output:0,
                 }
             ])
 
+        const editor = shallowRef({})
         const Vue = { version: 3, h, render };
-        const id = document.getElementById("drawflow");
-        const editor = new Drawflow(id, Vue);
-
-        // Pass render Vue 3 Instance
         const internalInstance = getCurrentInstance()
-        editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
+        internalInstance.appContext.app._context.config.globalProperties.$df = editor;
+        console.log("df drawflow", editor)
 
         // position of the node
         let node_move_select = '';
@@ -94,8 +93,55 @@
             editor.value.start();
             
             // registering nodes to the editor
+            let num1 = 0
+            let num2 = 0
             editor.value.registerNode('NodeNumber', <NodeNumber />, {}, {});
+            editor.value.registerNode('NodeOperation', <NodeOperation />, {}, {}); 
+
+            editor.value.on('connectionCreated', (data) => {
+
+                // const output_id = editor.value.getNodeFromId(data.output_id).id
+                const output = editor.value.getNodeFromId(data.output_id)
+                const outputNumber = parseInt(output.data.number);
+                const output_input = output.outputs.output_1.connections[0].output;
+
+                // console.log("outputId", output_id)
+                // // console.log("outputNumber", outputNumber)
+                // console.log("output", output)
+                // console.log("output_input",  output_input)
+
+                if(output_input == 'input_1'){
+                    num1 = outputNumber
+                    console.log("num1", num1)
+                }
+                else if(output_input == 'input_2'){
+                    num2 = outputNumber
+                    console.log("num2", num2)
+                }
+
+                const operationNode = editor.value.getNodeFromId(data.input_id)
+                console.log("operation node", operationNode)
+
+                // operationValues(num1, num2);
+                console.log("result", operationValues(num1, num2));
+            })
         })
+
+        function operationValues(num1, num2) {
+            let result = 0;
+            result = num1 + num2;
+            
+            editor.value.on('connectionCreated', (data) => {
+                const input_id = editor.value.getNodeFromId(data.input_id).id
+                const input = editor.value.getNodeFromId(data.input_id)
+                input.data.result = result
+                // console.log("update", updatedata)
+                console.log("input_id", input_id);
+                console.log("input", input);
+            })
+
+            return result;
+        }
     
         return {
             nodesList, drag, drop, allowDrop,
