@@ -17,6 +17,7 @@
     import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
+    // import { useStore } from 'vuex'
 
     export default {
         name: 'DrawflowDashboard',
@@ -40,7 +41,7 @@
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance()
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
-        console.log("df drawflow", editor)
+        // const { dispatch } = useStore(); 
 
         // position of the node
         let node_move_select = '';
@@ -99,47 +100,59 @@
             editor.value.registerNode('NodeOperation', <NodeOperation />, {}, {}); 
 
             editor.value.on('connectionCreated', (data) => {
-
                 // const output_id = editor.value.getNodeFromId(data.output_id).id
                 const output = editor.value.getNodeFromId(data.output_id)
-                const outputNumber = parseInt(output.data.number);
-                const output_input = output.outputs.output_1.connections[0].output;
+                console.log("output", output)
 
-                // console.log("outputId", output_id)
-                // // console.log("outputNumber", outputNumber)
-                // console.log("output", output)
-                // console.log("output_input",  output_input)
+                
+                // const outputNodeId = output.id;
+                const outputNumber = parseInt(output.data.number);
+                
+                const output_input = output.outputs.output_1.connections[0].output;
+                
+                const inputData = editor.value.getNodeFromId(data.input_id)
+                console.log("inputData", inputData)
+
+                let inputNode1 = 0
+                let inputNode2 = 0
+                if(inputData.inputs.input_1.connections[0] !== undefined) {
+                    inputNode1 = inputData.inputs.input_1.connections[0].node
+                }
+
+                if(inputData.inputs.input_2.connections[0] !== undefined) {
+                    inputNode2 = inputData.inputs.input_2.connections[0].node
+                }
 
                 if(output_input == 'input_1'){
-                    num1 = outputNumber
-                    console.log("num1", num1)
+                    // if(inputData.data.inputNode1 == inputData.inputs.input_1.connections[0].node || inputData.id <= 3) {
+                        // num2 = 0
+                        num1 = outputNumber
+                    // } 
                 }
                 else if(output_input == 'input_2'){
-                    num2 = outputNumber
-                    console.log("num2", num2)
+                    // if(inputData.data.inputNode2 == inputData.inputs.input_2.connections[0].node || inputData.id <= 3) {
+                        // num1 = 0
+                        num2 = outputNumber
+                    // }
                 }
 
-                const operationNode = editor.value.getNodeFromId(data.input_id)
-                console.log("operation node", operationNode)
+                operationValues(num1, num2);
+                const objectOperation = {
+                    result: operationValues(num1, num2), 
+                    inputNode1: inputNode1,
+                    inputNode2: inputNode2
+                }
 
-                // operationValues(num1, num2);
-                console.log("result", operationValues(num1, num2));
+                const operationValue = editor.value
+
+                const input_id = editor.value.getNodeFromId(data.input_id).id
+                operationValue.updateNodeDataFromId(input_id, objectOperation)
             })
         })
 
         function operationValues(num1, num2) {
             let result = 0;
-            result = num1 + num2;
-            
-            editor.value.on('connectionCreated', (data) => {
-                const input_id = editor.value.getNodeFromId(data.input_id).id
-                const input = editor.value.getNodeFromId(data.input_id)
-                input.data.result = result
-                // console.log("update", updatedata)
-                console.log("input_id", input_id);
-                console.log("input", input);
-            })
-
+            result = num1 + num2;   
             return result;
         }
     

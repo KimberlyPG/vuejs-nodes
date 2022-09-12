@@ -1,12 +1,10 @@
 <template>
     <title></title>
     <!-- {{ num1 }} -->
-    <input type="number" disabled df-result />
+    <input class="w-full" type="number" disabled df-result />
 </template>
 
 <script>
-    import { getCurrentInstance} from 'vue'
-
     export default {
         name: 'NodeOperation',
         props: {
