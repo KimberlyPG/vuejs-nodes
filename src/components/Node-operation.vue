@@ -1,15 +1,14 @@
 <template>
-    <title></title>
-    <!-- {{ num1 }} -->
+    <title>{{ title }}</title>
     <input class="w-full" type="number" disabled df-result />
 </template>
 
 <script>
+
     export default {
         name: 'NodeOperation',
-        props: {
-            num1: Number,
-            // num2: Number
-        },        
+        prop: {
+            title: String
+        }
     }
 </script>

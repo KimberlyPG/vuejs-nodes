@@ -24,17 +24,35 @@
         setup() {
             const nodesList = readonly([
                 {
-                    name: 'NodeNumber',
-                    item: 'NodeNumber',
+                    name: 'Number',
+                    item: 'number',
                     input:0,
                     output:1,
                 },
                 {
-                    name: 'NodeOperation',
-                    item: 'NodeOperation',
+                    name: 'Addition',
+                    item: 'addition',
                     input:2,
                     output:0,
-                }
+                },
+                {
+                    name: 'Subtraction',
+                    item: 'subtraction',
+                    input:2,
+                    output:0,
+                },
+                {
+                    name: 'Multiplication',
+                    item: 'multiplication',
+                    input:2,
+                    output:0,
+                },
+                {
+                    name: 'Division',
+                    item: 'division',
+                    input:2,
+                    output:0,
+                },
             ])
 
         const editor = shallowRef({})
@@ -93,11 +111,14 @@
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
             
-            // registering nodes to the editor
             let num1 = 0
             let num2 = 0
-            editor.value.registerNode('NodeNumber', <NodeNumber />, {}, {});
-            editor.value.registerNode('NodeOperation', <NodeOperation />, {}, {}); 
+            // registering nodes to the editor
+            editor.value.registerNode('number', <NodeNumber />, {}, {});
+            editor.value.registerNode('addition', <NodeOperation title='addition' />, {}, {}); 
+            editor.value.registerNode('subtraction', <NodeOperation title='subtraction' />, {}, {}); 
+            editor.value.registerNode('multiplication', <NodeOperation title='multiplication' />, {}, {}); 
+            editor.value.registerNode('division', <NodeOperation title='division' />, {}, {});
 
             editor.value.on('connectionCreated', (data) => {
                 // const output_id = editor.value.getNodeFromId(data.output_id).id
@@ -113,15 +134,18 @@
                 const inputData = editor.value.getNodeFromId(data.input_id)
                 console.log("inputData", inputData)
 
-                let inputNode1 = 0
-                let inputNode2 = 0
-                if(inputData.inputs.input_1.connections[0] !== undefined) {
-                    inputNode1 = inputData.inputs.input_1.connections[0].node
-                }
+                const nodeName = inputData.name;
+                console.log("name", nodeName);
 
-                if(inputData.inputs.input_2.connections[0] !== undefined) {
-                    inputNode2 = inputData.inputs.input_2.connections[0].node
-                }
+                // let inputNode1 = 0
+                // let inputNode2 = 0
+                // if(inputData.inputs.input_1.connections[0] !== undefined) {
+                //     inputNode1 = inputData.inputs.input_1.connections[0].node
+                // }
+
+                // if(inputData.inputs.input_2.connections[0] !== undefined) {
+                //     inputNode2 = inputData.inputs.input_2.connections[0].node
+                // }
 
                 if(output_input == 'input_1'){
                     // if(inputData.data.inputNode1 == inputData.inputs.input_1.connections[0].node || inputData.id <= 3) {
@@ -136,11 +160,10 @@
                     // }
                 }
 
-                operationValues(num1, num2);
+                let result = operationValues(num1, num2, nodeName)
+                // operationValues(num1, num2);
                 const objectOperation = {
-                    result: operationValues(num1, num2), 
-                    inputNode1: inputNode1,
-                    inputNode2: inputNode2
+                    result: result
                 }
 
                 const operationValue = editor.value
@@ -150,9 +173,24 @@
             })
         })
 
-        function operationValues(num1, num2) {
+        function operationValues(num1, num2, nodeName) {
             let result = 0;
-            result = num1 + num2;   
+            switch (nodeName) {
+                case 'addition':
+                    result = num1 + num2; 
+                    break;
+                case 'subtraction':
+                    result = num1 - num2;
+                    break;
+                case 'multiplication':
+                    result = num1 * num2;
+                    break;
+                case 'division':
+                    result = num1 / num2;
+                    break;
+                default:
+                    console.log('No name')
+            }
             return result;
         }
     
