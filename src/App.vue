@@ -1,5 +1,5 @@
 <template>
-  <h1 className="flex justify-center my-5 text-2xl text-bold text-white">Drawflow</h1>
+  <h1 className="flex justify-center  text-2xl text-bold text-white bg-blue-600 my-5">Drawflow</h1>
   <DrawflowDashboard />
 </template>
 

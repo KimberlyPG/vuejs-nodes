@@ -1,13 +1,28 @@
 <template>
-    <div class="h-[900px] flex flex-row w-full ">
-        <div className="w-[150px] text-lg mx-auto">
-            <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
-                <span class="node bg-pink-200">{{ i.name }}</span>
+    <div className="h-full mx-2">
+        <div class="h-3/4 flex flex-row w-full">
+            <div className="w-[190px] text-sm mx-auto p-2">
+                <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
+                    <span class="node">{{ i.name }}</span>
+                </div>
             </div>
-        </div>
 
-        <div class="pt-2 h-4/5 w-4/5 mx-auto">
-            <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
+            <div class="h-[700px] w-full mx-2">
+                <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
+            </div>
+            <div className="bg-white text-black w-1/4 flex">
+                <div>
+                    <div className="flex">
+                        <img 
+                        className="w-10"
+                        src='../assets/python.jpg' 
+                        alt=""
+                        >
+                        <h3 className="text-gray-700">Python code</h3>
+                    </div>
+                    <p className="text-gray-600">the code is...</p>
+            </div>
+            </div>
         </div>
     </div>
 </template>
@@ -21,6 +36,8 @@
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
     import NodeIf from './Node-if.vue'
+    import NodeCondition from './Node-condition.vue'
+    // import python from '../assets/python.jpg'
     // import { useStore } from 'vuex'
 
     export default {
@@ -68,6 +85,12 @@
                     item: 'if',
                     input: 0,
                     output: 1 
+                },
+                {
+                    name: 'Condition result',
+                    item: 'nodeCondition',
+                    input: 1,
+                    output: 0 
                 }
             ])
 
@@ -138,6 +161,7 @@
             editor.value.registerNode('division', <NodeOperation title='division' />, {}, {});
             editor.value.registerNode('assign', <NodeAssign />, {}, {});
             editor.value.registerNode('if', <NodeIf title='condition'/>, {}, {});
+            editor.value.registerNode('nodeCondition', <NodeCondition title='condition result'/>, {}, {});
 
             editor.value.on('connectionCreated', (data) => {
                 const output = editor.value.getNodeFromId(data.output_id)
@@ -160,7 +184,7 @@
                     total = outputTotal
                 }
                 
-                if(nodeName == 'assign') {
+                if(nodeName === 'assign') {
                     const objectOperation = {
                         assign: total
                     }
@@ -175,6 +199,16 @@
                         result: result
                     }
                   
+                    const operationValue = editor.value
+                    const input_id = editor.value.getNodeFromId(data.input_id).id
+                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                }
+
+                if(nodeName === 'nodeCondition') {
+                    const conditionResult  = validateOperations(output.data.num1, output.data.num2, output.data.option);
+                    const objectOperation = {
+                        assign: conditionResult
+                    }
                     const operationValue = editor.value
                     const input_id = editor.value.getNodeFromId(data.input_id).id
                     operationValue.updateNodeDataFromId(input_id, objectOperation)
@@ -198,6 +232,50 @@
                     break;
                 case 'division':
                     result = num1 / num2;
+                    break;
+                default:
+                    console.log('No name')
+            }
+            return result;
+        }
+
+        function validateOperations(num1, num2, nodeName) {
+            let result = false;
+            switch (nodeName) {
+                case 'less':
+                    if(num1 < num2) {
+                        result = true
+                    } else {
+                        result = false;
+                    }
+                    break;
+                case 'greater':
+                    if(num1 > num2) {
+                        result = true
+                    } else {
+                        result = false;
+                    }
+                    break;
+                case 'lessEqual':
+                    if(num1 <= num2) {
+                        result = true
+                    } else {
+                        result = false;
+                    }
+                    break;
+                case 'greaterEqual':
+                    if(num1 >= num2) {
+                        result = true
+                    } else {
+                        result = false;
+                    }
+                    break;
+                case 'equal':
+                    if(num1 == num2) {
+                        result = true
+                    } else {
+                        result = false;
+                    }
                     break;
                 default:
                     console.log('No name')
