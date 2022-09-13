@@ -1,10 +1,12 @@
 <template>
-    <div class="h-[700px] w-full">
-        <div class="nodes-list w-40" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
-            <span class="node bg-pink-200">{{ i.name }}</span>
+    <div class="h-[900px] flex flex-row w-full ">
+        <div className="w-[150px] text-lg mx-auto">
+            <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
+                <span class="node bg-pink-200">{{ i.name }}</span>
+            </div>
         </div>
 
-        <div class="pt-2 h-4/5 w=3/5">
+        <div class="pt-2 h-4/5 w-4/5 mx-auto">
             <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
         </div>
     </div>
@@ -212,8 +214,8 @@
 
 <style scoped>
     .node {
-        background-color: aliceblue;
-        color:#494949;
+        background-color: rgb(74, 138, 194);
+        color:#f7f7f7;
         padding: 5px;
         border-radius: 8px;
         border: 2px solid #494949;
@@ -227,8 +229,8 @@
       width: 100%;
       height: 100%;
       text-align: initial;
-      background: #dfa4e7;
+      background: #f1eeee;
       background-size: 20px 20px;
-      background-image: radial-gradient(#494949 1px, transparent 1px);      
+      background-image: radial-gradient(#b6b4b4 1px, transparent 1px);      
     }
     </style>
