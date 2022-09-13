@@ -18,6 +18,7 @@
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
+    import NodeIf from './Node-if.vue'
     // import { useStore } from 'vuex'
 
     export default {
@@ -59,6 +60,12 @@
                     item: 'assign',
                     input: 1,
                     output: 0
+                },
+                {
+                    name: 'If-else',
+                    item: 'if',
+                    input: 0,
+                    output: 1 
                 }
             ])
 
@@ -128,6 +135,7 @@
             editor.value.registerNode('multiplication', <NodeOperation title='multiplication' />, {}, {}); 
             editor.value.registerNode('division', <NodeOperation title='division' />, {}, {});
             editor.value.registerNode('assign', <NodeAssign />, {}, {});
+            editor.value.registerNode('if', <NodeIf title='condition'/>, {}, {});
 
             editor.value.on('connectionCreated', (data) => {
                 const output = editor.value.getNodeFromId(data.output_id)
