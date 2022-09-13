@@ -32,13 +32,13 @@
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css'
     import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
+    // import { useStore } from 'vuex'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
-    // import python from '../assets/python.jpg'
-    // import { useStore } from 'vuex'
+    import NodeFor from './Node-for.vue'
 
     export default {
         name: 'DrawflowDashboard',
@@ -87,11 +87,17 @@
                     output: 1 
                 },
                 {
+                    name: 'For',
+                    item: 'for',
+                    input: 0,
+                    output: 1 
+                },
+                {
                     name: 'Condition result',
                     item: 'nodeCondition',
                     input: 1,
                     output: 0 
-                }
+                },
             ])
 
         const editor = shallowRef({})
@@ -154,14 +160,22 @@
             let num2 = 0
             let total = 0
             // registering nodes to the editor
-            editor.value.registerNode('number', <NodeNumber title='addition' />, {}, {});
-            editor.value.registerNode('addition', <NodeOperation title='addition' />, {}, {}); 
-            editor.value.registerNode('subtraction', <NodeOperation title='subtraction' />, {}, {}); 
-            editor.value.registerNode('multiplication', <NodeOperation title='multiplication' />, {}, {}); 
-            editor.value.registerNode('division', <NodeOperation title='division' />, {}, {});
+            editor.value.registerNode('number', <NodeNumber />, {}, {});
+            editor.value.registerNode('addition', <NodeOperation title='Addition' />, {}, {}); 
+            editor.value.registerNode('subtraction', <NodeOperation title='Subtraction' />, {}, {}); 
+            editor.value.registerNode('multiplication', <NodeOperation title='Multiplication' />, {}, {}); 
+            editor.value.registerNode('division', <NodeOperation title='Division' />, {}, {});
             editor.value.registerNode('assign', <NodeAssign />, {}, {});
-            editor.value.registerNode('if', <NodeIf title='condition'/>, {}, {});
-            editor.value.registerNode('nodeCondition', <NodeCondition title='condition result'/>, {}, {});
+            editor.value.registerNode('if', <NodeIf title='If statement'/>, {}, {});
+            editor.value.registerNode('for', <NodeFor title='For statement'/>, {}, {});
+            editor.value.registerNode('nodeCondition', <NodeCondition />, {}, {});
+
+            // editor.value.on('nodeDataChanged', (data) => {
+            //     const output = editor.value.getNodeFromId(data)
+            //     console.log("output", output)
+            //     // const outputNumber = parseInt(output.data.number);
+            //     // console.log("outpuNumber", outputNumber)        
+            // })
 
             editor.value.on('connectionCreated', (data) => {
                 const output = editor.value.getNodeFromId(data.output_id)
@@ -171,6 +185,8 @@
                 const outputTotal = parseInt(output.data.result)
                   
                 const inputData = editor.value.getNodeFromId(data.input_id)
+                // const inputData1 = inputData.inputs.input_1.connections[0];
+                // const inputData2 = inputData.inputs.input_2.connections[0];
                 const nodeName = inputData.name;
                 
                 if(nodeName !== 'assign'){
@@ -204,8 +220,18 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation)
                 }
 
-                if(nodeName === 'nodeCondition') {
-                    const conditionResult  = validateOperations(output.data.num1, output.data.num2, output.data.option);
+                if(nodeName === 'nodeCondition' && output.class === 'if') {
+                    const conditionResult = validateIf(output.data.num1, output.data.num2, output.data.option);
+                    const objectOperation = {
+                        assign: conditionResult
+                    }
+                    const operationValue = editor.value
+                    const input_id = editor.value.getNodeFromId(data.input_id).id
+                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                }
+
+                if(nodeName === 'nodeCondition' && output.class === 'for') {
+                    const conditionResult = validateFor(output.data.num1, output.data.num2);
                     const objectOperation = {
                         assign: conditionResult
                     }
@@ -239,7 +265,7 @@
             return result;
         }
 
-        function validateOperations(num1, num2, nodeName) {
+        function validateIf(num1, num2, nodeName) {
             let result = false;
             switch (nodeName) {
                 case 'less':
@@ -281,6 +307,18 @@
                     console.log('No name')
             }
             return result;
+        }
+
+        function validateFor(num1, num2) {
+            let result = 0;
+            let message = '';
+            
+            while (num1 < num2) {
+                num1++;
+                result++;
+            }
+            message = `Ciclos ${result}`;
+            return message;
         }
     
         return {

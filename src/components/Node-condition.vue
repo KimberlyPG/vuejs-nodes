@@ -1,5 +1,5 @@
 <template>
-    <h3>Result</h3>
+    <h2 className="text-sm">Result</h2>
     <input class="w-full text-xs" type="text" disabled df-assign>
 </template>
 

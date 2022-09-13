@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>Number</p>
+        <p className="text-sm">Number</p>
         <input class="number-class w-full" type="number" df-number @change="updateSelect" />
     </div>
 </template>
