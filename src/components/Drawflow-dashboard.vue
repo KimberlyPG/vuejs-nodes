@@ -4,7 +4,7 @@
             <span class="node bg-pink-200">{{ i.name }}</span>
         </div>
 
-        <div class="pt-2 h-4/5 w-full">
+        <div class="pt-2 h-4/5 w=3/5">
             <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
         </div>
     </div>
@@ -120,6 +120,7 @@
             
             let num1 = 0
             let num2 = 0
+            let total = 0
             // registering nodes to the editor
             editor.value.registerNode('number', <NodeNumber title='addition' />, {}, {});
             editor.value.registerNode('addition', <NodeOperation title='addition' />, {}, {}); 
@@ -133,33 +134,43 @@
                 console.log("output", output)
                 const outputNumber = parseInt(output.data.number);       
                 const output_input = output.outputs.output_1.connections[0].output;
-                
+                const outputTotal = parseInt(output.data.result)
+                  
                 const inputData = editor.value.getNodeFromId(data.input_id)
-                console.log("inputData", inputData)
                 const nodeName = inputData.name;
+                
+                if(nodeName !== 'assign'){
+                    if(output_input == 'input_1'){              
+                        num1 = outputNumber
+                    }
+                    else if(output_input == 'input_2'){
+                        num2 = outputNumber
+                    }
+                } else {
+                    total = outputTotal
+                }
+                
+                if(nodeName == 'assign') {
+                    const objectOperation = {
+                        assign: total
+                    }
+                    const operationValue = editor.value
+                    const input_id = editor.value.getNodeFromId(data.input_id).id
+                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    
 
-                
-                if(output_input == 'input_1'){              
-                    num1 = outputNumber
+                } else {
+                    let result = operationValues(num1, num2, nodeName)
+                    const objectOperation = {
+                        result: result
+                    }
+                  
+                    const operationValue = editor.value
+                    const input_id = editor.value.getNodeFromId(data.input_id).id
+                    operationValue.updateNodeDataFromId(input_id, objectOperation)
                 }
-                else if(output_input == 'input_2'){
-                    num2 = outputNumber
-                }
-                
-                let result = operationValues(num1, num2, nodeName)
-                console.log("result", result)
-                const objectOperation = {
-                    result: result
-                }
-                
-                // if(nodeName == 'assign') {
-                //     const assignData = inputData.data.assign;
-                //     console.log("assign", assignData + "" + result)
-                // }
 
-                const operationValue = editor.value
-                const input_id = editor.value.getNodeFromId(data.input_id).id
-                operationValue.updateNodeDataFromId(input_id, objectOperation)
+                console.log("inputData", inputData)
             })
         })
 
