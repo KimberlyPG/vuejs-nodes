@@ -17,6 +17,6 @@ body {
    font-size: 20px;
    width: 100%;
    height: 100%;
-   background: #e6e0e0;
+   background: #e9e4e4;
 }
 </style>

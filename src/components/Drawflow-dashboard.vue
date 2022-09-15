@@ -159,7 +159,8 @@
             let num1 = 0
             let num2 = 0
             let total = 0
-            // registering nodes to the editor
+
+            // registering nodes on the editor
             editor.value.registerNode('number', <NodeNumber />, {}, {});
             editor.value.registerNode('addition', <NodeOperation title='Addition' />, {}, {}); 
             editor.value.registerNode('subtraction', <NodeOperation title='Subtraction' />, {}, {}); 
@@ -170,46 +171,95 @@
             editor.value.registerNode('for', <NodeFor title='For statement'/>, {}, {});
             editor.value.registerNode('nodeCondition', <NodeCondition />, {}, {});
 
-            // editor.value.on('nodeDataChanged', (data) => {
-            //     const output = editor.value.getNodeFromId(data)
-            //     console.log("output", output)
-            //     // const outputNumber = parseInt(output.data.number);
-            //     // console.log("outpuNumber", outputNumber)        
-            // })
+            editor.value.on('nodeDataChanged', (data) => {
+                const nodeData = editor.value.getNodeFromId(data)
+                const outputNode = nodeData.outputs.output_1.connections
+               
+                if(outputNode.length > 0) {
+                    const outputNumber = parseInt(nodeData.data.number)
+                    const nodeDataOuput = nodeData.outputs.output_1.connections[0].output;
+                    const inputNodeId = nodeData.outputs.output_1.connections[0].node;
+                    const inputNodeData = editor.value.getNodeFromId(inputNodeId)
+                    const inputNodeName = inputNodeData.name;
+                    const outputTotal = parseInt(inputNodeData.data.result)
+
+                   
+                    if(inputNodeName === 'subtraction' || inputNodeName === 'addition' || inputNodeName === 'multiplication' || inputNodeName === 'division') {
+                        total = outputTotal
+                        const objectOperation = {
+                            assign: total 
+                        }
+
+                        const nodeConditionData = editor.value.getNodeFromId(outputNode[0].node)
+                        const nodeConditionOutputs = nodeConditionData.outputs.output_1.connections
+                        if(nodeConditionOutputs.length > 0){
+                            const operationValue = editor.value
+                            const node_id = nodeConditionData.outputs.output_1.connections[0].node
+                            operationValue.updateNodeDataFromId(node_id, objectOperation)
+                        }
+                    }
+
+                    if(inputNodeName !== 'assign' ){
+                        if(nodeDataOuput == 'input_1'){              
+                            num1 = outputNumber
+                        }
+                        else if(nodeDataOuput == 'input_2'){
+                            num2 = outputNumber
+                        }
+
+                        let result = operationValues(num1, num2, inputNodeName)
+                        const objectOperation = {
+                            result: result
+                        }
+                    
+                        const operationValue = editor.value
+                        const input_id = inputNodeData.id
+                        operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    } 
+                     
+     
+                    if(inputNodeName === 'nodeCondition' && nodeData.name == 'if') {
+                        const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
+                        const objectOperation = {
+                            assign: conditionResult
+                        }
+                        const operationValue = editor.value
+                        const input_id = inputNodeData.id
+                        operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    }
+
+                    if(inputNodeName === 'nodeCondition' && nodeData.name === 'for') {
+                        const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
+                        const objectOperation = {
+                            assign: conditionResult
+                        }
+                        const operationValue = editor.value
+                        const input_id = inputNodeData.id
+                        operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    }
+                }
+
+            })     
 
             editor.value.on('connectionCreated', (data) => {
                 const output = editor.value.getNodeFromId(data.output_id)
-                console.log("output", output)
-                const outputNumber = parseInt(output.data.number);       
-                const output_input = output.outputs.output_1.connections[0].output;
+                // console.log("output number", output)
+                const outputNumber = parseInt(output.data.number);      
+                const nodeDataOuput = output.outputs.output_1.connections[0].output;
                 const outputTotal = parseInt(output.data.result)
                   
                 const inputData = editor.value.getNodeFromId(data.input_id)
-                // const inputData1 = inputData.inputs.input_1.connections[0];
-                // const inputData2 = inputData.inputs.input_2.connections[0];
                 const nodeName = inputData.name;
-                
+                const conditionName = output.name;
+          
                 if(nodeName !== 'assign'){
-                    if(output_input == 'input_1'){              
+                    if(nodeDataOuput == 'input_1'){              
                         num1 = outputNumber
                     }
-                    else if(output_input == 'input_2'){
+                    else if(nodeDataOuput == 'input_2'){
                         num2 = outputNumber
                     }
-                } else {
-                    total = outputTotal
-                }
-                
-                if(nodeName === 'assign') {
-                    const objectOperation = {
-                        assign: total
-                    }
-                    const operationValue = editor.value
-                    const input_id = editor.value.getNodeFromId(data.input_id).id
-                    operationValue.updateNodeDataFromId(input_id, objectOperation)
-                    
 
-                } else {
                     let result = operationValues(num1, num2, nodeName)
                     const objectOperation = {
                         result: result
@@ -218,10 +268,19 @@
                     const operationValue = editor.value
                     const input_id = editor.value.getNodeFromId(data.input_id).id
                     operationValue.updateNodeDataFromId(input_id, objectOperation)
-                }
+                } else {
+                    total = outputTotal
 
-                if(nodeName === 'nodeCondition' && output.class === 'if') {
-                    const conditionResult = validateIf(output.data.num1, output.data.num2, output.data.option);
+                    const objectOperation = {
+                        assign: total
+                    }
+                    const operationValue = editor.value
+                    const input_id = editor.value.getNodeFromId(data.input_id).id
+                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                }
+                
+                if(nodeName === 'nodeCondition' && conditionName === 'if') {
+                    const conditionResult = validateIf(parseInt(output.data.num1), parseInt(output.data.num2), output.data.option);
                     const objectOperation = {
                         assign: conditionResult
                     }
@@ -230,8 +289,8 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation)
                 }
 
-                if(nodeName === 'nodeCondition' && output.class === 'for') {
-                    const conditionResult = validateFor(output.data.num1, output.data.num2);
+                if(nodeName === 'nodeCondition' && conditionName === 'for') {
+                    const conditionResult = validateFor(parseInt(output.data.num1), parseInt(output.data.num2));
                     const objectOperation = {
                         assign: conditionResult
                     }
@@ -239,10 +298,8 @@
                     const input_id = editor.value.getNodeFromId(data.input_id).id
                     operationValue.updateNodeDataFromId(input_id, objectOperation)
                 }
-
-                console.log("inputData", inputData)
             })
-        })
+        })        
 
         function operationValues(num1, num2, nodeName) {
             let result = 0;
@@ -317,10 +374,11 @@
                 num1++;
                 result++;
             }
+            console.log("res", result)
             message = `Ciclos ${result}`;
             return message;
         }
-    
+              
         return {
             nodesList, drag, drop, allowDrop,
         }
