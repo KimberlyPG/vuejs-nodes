@@ -18,9 +18,19 @@
                         src='../assets/python.jpg' 
                         alt=""
                         >
-                        <h3 className="text-gray-700">Python code</h3>
+                        <h3 className="text-gray-700">
+                            Python code
+                        </h3>
                     </div>
-                    <p className="text-gray-600">the code is...</p>
+                    <!-- <div className="text-gray-600" @change="javascriptToPython($event)">
+                        pyhon code..
+                    </div> -->
+                    <div className="text-gray-600">
+                        pyhon code..
+                        <!-- <div class="code-print"></div> -->
+                        <p>{{jsToPython}}</p>
+                        <!-- <input type="text" disabled df-codep> -->
+                    </div>
             </div>
             </div>
         </div>
@@ -41,283 +51,278 @@
     import NodeFor from './Node-for.vue'
 
     export default {
-        name: 'DrawflowDashboard',
-        setup() {
-            const nodesList = readonly([
-                {
-                    name: 'Number',
-                    item: 'number',
-                    input:0,
-                    output:1,
-                },
-                {
-                    name: 'Addition',
-                    item: 'addition',
-                    input:2,
-                    output:1,
-                },
-                {
-                    name: 'Subtraction',
-                    item: 'subtraction',
-                    input:2,
-                    output:1,
-                },
-                {
-                    name: 'Multiplication',
-                    item: 'multiplication',
-                    input:2,
-                    output:1,
-                },
-                {
-                    name: 'Division',
-                    item: 'division',
-                    input:2,
-                    output:1,
-                },
-                {
-                    name: 'Assign',
-                    item: 'assign',
-                    input: 1,
-                    output: 0
-                },
-                {
-                    name: 'If-else',
-                    item: 'if',
-                    input: 0,
-                    output: 1 
-                },
-                {
-                    name: 'For',
-                    item: 'for',
-                    input: 0,
-                    output: 1 
-                },
-                {
-                    name: 'Condition result',
-                    item: 'nodeCondition',
-                    input: 1,
-                    output: 0 
-                },
-            ])
+    name: "DrawflowDashboard",
+    setup() {
+        const nodesList = readonly([
+            {
+                name: "Number",
+                item: "number",
+                input: 0,
+                output: 1,
+            },
+            {
+                name: "Addition",
+                item: "addition",
+                input: 2,
+                output: 1,
+            },
+            {
+                name: "Subtraction",
+                item: "subtraction",
+                input: 2,
+                output: 1,
+            },
+            {
+                name: "Multiplication",
+                item: "multiplication",
+                input: 2,
+                output: 1,
+            },
+            {
+                name: "Division",
+                item: "division",
+                input: 2,
+                output: 1,
+            },
+            {
+                name: "Assign",
+                item: "assign",
+                input: 1,
+                output: 0
+            },
+            {
+                name: "If-else",
+                item: "if",
+                input: 0,
+                output: 1
+            },
+            {
+                name: "For",
+                item: "for",
+                input: 0,
+                output: 1
+            },
+            {
+                name: "Condition result",
+                item: "nodeCondition",
+                input: 1,
+                output: 0
+            },
+        ]);
 
-        const editor = shallowRef({})
+        const jsToPython = shallowRef('');
+        // const [jsToPython, setJsToPytho] = useState('')
+
+        const editor = shallowRef({});
         const Vue = { version: 3, h, render };
-        const internalInstance = getCurrentInstance()
+        const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
         // const { dispatch } = useStore(); 
-
         // position of the node
-        let node_move_select = '';
+        let node_move_select = "";
         let node_last_move = null;
-
         // node taken
         const drag = (ev) => {
             if (ev.type === "touchstart") {
-                console.log("drag", ev)
-                node_move_select = ev.target.closest(".nodes-list").getAttribute('node-item');
-            } else {
-                ev.dataTransfer.setData("node", ev.target.getAttribute('node-item'));
+                console.log("drag", ev);
+                node_move_select = ev.target.closest(".nodes-list").getAttribute("node-item");
             }
-        }
-        
+            else {
+                ev.dataTransfer.setData("node", ev.target.getAttribute("node-item"));
+            }
+        };
         const allowDrop = (ev) => {
             ev.preventDefault();
-        }
-        
+        };
         // node dropped
         const drop = (ev) => {
             if (ev.type === "touchend") {
-                console.log("drop", ev)
+                console.log("drop", ev);
                 let parentdrawflow = document.elementFromPoint(node_last_move.touches[0].clientX, node_last_move.touches[0].clientY).closest("#drawflow");
-                if(parentdrawflow != null) {
-                addNodeToDrawFlow(node_move_select, node_last_move.touches[0].clientX, node_last_move.touches[0].clientY);
+                if (parentdrawflow != null) {
+                    addNodeToDrawFlow(node_move_select, node_last_move.touches[0].clientX, node_last_move.touches[0].clientY);
+                }
             }
-            } else {
+            else {
                 ev.preventDefault();
-                let data = ev.dataTransfer.getData("node"); 
+                let data = ev.dataTransfer.getData("node");
                 addNodeToDrawFlow(data, ev.clientX, ev.clientY); //node name, x pos, y pos
             }
-        }
-
+        };
         // drop node into drarflow editor
         const addNodeToDrawFlow = (name, pos_x, pos_y) => {
-            pos_x = pos_x * ( editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x 
-            * ( editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
-            pos_y = pos_y * ( editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y 
-            * ( editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
-            
+            pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x
+                * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
+            pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
+                * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
             // adding node to drawflow
-            const nodeSelected = nodesList.find(object => object.item == name); 
-            editor.value.addNode(name, nodeSelected.input,  nodeSelected.output, pos_x, pos_y, name, {}, name, 'vue'); 
-        }
+            const nodeSelected = nodesList.find(object => object.item == name);
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {}, name, "vue");
+        };
 
-        onMounted(() => {            
+        onMounted(() => {
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
-            
-            let num1 = 0
-            let num2 = 0
-            let total = 0
-
+            let num1 = 0;
+            let num2 = 0;
+            let total = 0;
             // registering nodes on the editor
-            editor.value.registerNode('number', <NodeNumber />, {}, {});
-            editor.value.registerNode('addition', <NodeOperation title='Addition' />, {}, {}); 
-            editor.value.registerNode('subtraction', <NodeOperation title='Subtraction' />, {}, {}); 
-            editor.value.registerNode('multiplication', <NodeOperation title='Multiplication' />, {}, {}); 
-            editor.value.registerNode('division', <NodeOperation title='Division' />, {}, {});
-            editor.value.registerNode('assign', <NodeAssign />, {}, {});
-            editor.value.registerNode('if', <NodeIf title='If statement'/>, {}, {});
-            editor.value.registerNode('for', <NodeFor title='For statement'/>, {}, {});
-            editor.value.registerNode('nodeCondition', <NodeCondition />, {}, {});
-
-            editor.value.on('nodeDataChanged', (data) => {
-                const nodeData = editor.value.getNodeFromId(data)
-                const outputNode = nodeData.outputs.output_1.connections
-               
-                if(outputNode.length > 0) {
-                    const outputNumber = parseInt(nodeData.data.number)
-                    const nodeDataOuput = nodeData.outputs.output_1.connections[0].output;
-                    const inputNodeId = nodeData.outputs.output_1.connections[0].node;
-                    const inputNodeData = editor.value.getNodeFromId(inputNodeId)
-                    const inputNodeName = inputNodeData.name;
-                    const outputTotal = parseInt(inputNodeData.data.result)
-
-                   
-                    if(inputNodeName === 'subtraction' || inputNodeName === 'addition' || inputNodeName === 'multiplication' || inputNodeName === 'division') {
-                        total = outputTotal
-                        const objectOperation = {
-                            assign: total 
-                        }
-
-                        const nodeConditionData = editor.value.getNodeFromId(outputNode[0].node)
-                        const nodeConditionOutputs = nodeConditionData.outputs.output_1.connections
-                        if(nodeConditionOutputs.length > 0){
-                            const operationValue = editor.value
-                            const node_id = nodeConditionData.outputs.output_1.connections[0].node
-                            operationValue.updateNodeDataFromId(node_id, objectOperation)
-                        }
-                    }
-
-                    if(inputNodeName !== 'assign' ){
-                        if(nodeDataOuput == 'input_1'){              
-                            num1 = outputNumber
-                        }
-                        else if(nodeDataOuput == 'input_2'){
-                            num2 = outputNumber
-                        }
-
-                        let result = operationValues(num1, num2, inputNodeName)
-                        const objectOperation = {
-                            result: result
-                        }
-                    
-                        const operationValue = editor.value
-                        const input_id = inputNodeData.id
-                        operationValue.updateNodeDataFromId(input_id, objectOperation)
-                    } 
-                     
-     
-                    if(inputNodeName === 'nodeCondition' && nodeData.name == 'if') {
-                        const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
-                        const objectOperation = {
-                            assign: conditionResult
-                        }
-                        const operationValue = editor.value
-                        const input_id = inputNodeData.id
-                        operationValue.updateNodeDataFromId(input_id, objectOperation)
-                    }
-
-                    if(inputNodeName === 'nodeCondition' && nodeData.name === 'for') {
-                        const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
-                        const objectOperation = {
-                            assign: conditionResult
-                        }
-                        const operationValue = editor.value
-                        const input_id = inputNodeData.id
-                        operationValue.updateNodeDataFromId(input_id, objectOperation)
+            editor.value.registerNode("number", <NodeNumber />, {}, {});
+            editor.value.registerNode("addition", <NodeOperation title="Addition"/>, {}, {});
+            editor.value.registerNode("subtraction", <NodeOperation title="Subtraction"/>, {}, {});
+            editor.value.registerNode("multiplication", <NodeOperation title="Multiplication"/>, {}, {});
+            editor.value.registerNode("division", <NodeOperation title="Division"/>, {}, {});
+            editor.value.registerNode("assign", <NodeAssign />, {}, {});
+            editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
+            editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
+            editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
+            editor.value.on("nodeDataChanged", (data) => {
+                const nodeData = editor.value.getNodeFromId(data);
+                console.log("nodeData", nodeData);
+                let variableName = "";
+                if (nodeData.name == "assign") {
+                    variableName = nodeData.data.name;
+                    if (nodeData.inputs.input_1.connections.length > 0) {
+                        javascriptToPython(variableName);
                     }
                 }
-
-            })     
-
-            editor.value.on('connectionCreated', (data) => {
-                const output = editor.value.getNodeFromId(data.output_id)
-                // console.log("output number", output)
-                const outputNumber = parseInt(output.data.number);      
+                else {
+                    const outputNode = nodeData.outputs.output_1.connections;
+                    if (outputNode.length > 0) {
+                        const outputNumber = parseInt(nodeData.data.number);
+                        const nodeDataOuput = nodeData.outputs.output_1.connections[0].output;
+                        const inputNodeId = nodeData.outputs.output_1.connections[0].node;
+                        const inputNodeData = editor.value.getNodeFromId(inputNodeId);
+                        const inputNodeName = inputNodeData.name;
+                        console.log("node name", inputNodeName);
+                        const outputTotal = parseInt(inputNodeData.data.result);
+                        if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
+                            total = outputTotal;
+                            console.log("da", inputNodeData.data);
+                            const objectOperation = {
+                                assign: total
+                            };
+                            const nodeOperation = editor.value.getNodeFromId(outputNode[0].node);
+                            const nodeOperationConnections = nodeOperation.outputs.output_1.connections;
+                            if (nodeOperationConnections.length > 0) {
+                                const operationValue = editor.value;
+                                const node_id = nodeOperation.outputs.output_1.connections[0].node;
+                                // const nodeAssignData = editor.value.getNodeFromId(node_id);
+                                // variableName = nodeAssignData.data.name;
+                                operationValue.updateNodeDataFromId(node_id, objectOperation);
+                            }
+                        }
+                        if (inputNodeName !== "assign") {
+                            if (nodeDataOuput == "input_1") {
+                                num1 = outputNumber;
+                            }
+                            else if (nodeDataOuput == "input_2") {
+                                num2 = outputNumber;
+                            }
+                            let result = operationValues(num1, num2, inputNodeName);
+                            const objectOperation = {
+                                result: result
+                            };
+                            const operationValue = editor.value;
+                            const input_id = inputNodeData.id;
+                            operationValue.updateNodeDataFromId(input_id, objectOperation);
+                        }
+                        if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
+                            const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
+                            const objectOperation = {
+                                assign: conditionResult
+                            };
+                            const operationValue = editor.value;
+                            const input_id = inputNodeData.id;
+                            operationValue.updateNodeDataFromId(input_id, objectOperation);
+                        }
+                        if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
+                            const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
+                            const objectOperation = {
+                                assign: conditionResult
+                            };
+                            const operationValue = editor.value;
+                            const input_id = inputNodeData.id;
+                            operationValue.updateNodeDataFromId(input_id, objectOperation);
+                        }
+                        javascriptToPython(variableName);
+                    }
+                }
+            });
+            editor.value.on("connectionCreated", (data) => {
+                const output = editor.value.getNodeFromId(data.output_id);
+                const outputNumber = parseInt(output.data.number);
                 const nodeDataOuput = output.outputs.output_1.connections[0].output;
-                const outputTotal = parseInt(output.data.result)
-                  
-                const inputData = editor.value.getNodeFromId(data.input_id)
+                const outputTotal = parseInt(output.data.result);
+                const inputData = editor.value.getNodeFromId(data.input_id);
                 const nodeName = inputData.name;
                 const conditionName = output.name;
-          
-                if(nodeName !== 'assign'){
-                    if(nodeDataOuput == 'input_1'){              
-                        num1 = outputNumber
+                let variableName = "";
+                if (nodeName !== "assign") {
+                    if (nodeDataOuput == "input_1") {
+                        num1 = outputNumber;
                     }
-                    else if(nodeDataOuput == 'input_2'){
-                        num2 = outputNumber
+                    else if (nodeDataOuput == "input_2") {
+                        num2 = outputNumber;
                     }
-
-                    let result = operationValues(num1, num2, nodeName)
+                    let result = operationValues(num1, num2, nodeName);
                     const objectOperation = {
                         result: result
-                    }
-                  
-                    const operationValue = editor.value
-                    const input_id = editor.value.getNodeFromId(data.input_id).id
-                    operationValue.updateNodeDataFromId(input_id, objectOperation)
-                } else {
-                    total = outputTotal
-
+                    };
+                    const operationValue = editor.value;
+                    const input_id = editor.value.getNodeFromId(data.input_id).id;
+                    operationValue.updateNodeDataFromId(input_id, objectOperation);
+                }
+                else {
+                    variableName = inputData.data.name;
+                    total = outputTotal;
                     const objectOperation = {
                         assign: total
-                    }
-                    const operationValue = editor.value
-                    const input_id = editor.value.getNodeFromId(data.input_id).id
-                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    };
+                    const operationValue = editor.value;
+                    const input_id = editor.value.getNodeFromId(data.input_id).id;
+                    operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
-                
-                if(nodeName === 'nodeCondition' && conditionName === 'if') {
+                if (nodeName === "nodeCondition" && conditionName === "if") {
                     const conditionResult = validateIf(parseInt(output.data.num1), parseInt(output.data.num2), output.data.option);
                     const objectOperation = {
                         assign: conditionResult
-                    }
-                    const operationValue = editor.value
-                    const input_id = editor.value.getNodeFromId(data.input_id).id
-                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    };
+                    const operationValue = editor.value;
+                    const input_id = editor.value.getNodeFromId(data.input_id).id;
+                    operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
-
-                if(nodeName === 'nodeCondition' && conditionName === 'for') {
+                if (nodeName === "nodeCondition" && conditionName === "for") {
                     const conditionResult = validateFor(parseInt(output.data.num1), parseInt(output.data.num2));
                     const objectOperation = {
                         assign: conditionResult
-                    }
-                    const operationValue = editor.value
-                    const input_id = editor.value.getNodeFromId(data.input_id).id
-                    operationValue.updateNodeDataFromId(input_id, objectOperation)
+                    };
+                    const operationValue = editor.value;
+                    const input_id = editor.value.getNodeFromId(data.input_id).id;
+                    operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
-            })
-        })        
+                javascriptToPython(variableName);
+            });
+        });
 
         function operationValues(num1, num2, nodeName) {
             let result = 0;
             switch (nodeName) {
-                case 'addition':
-                    result = num1 + num2; 
+                case "addition":
+                    result = num1 + num2;
                     break;
-                case 'subtraction':
+                case "subtraction":
                     result = num1 - num2;
                     break;
-                case 'multiplication':
+                case "multiplication":
                     result = num1 * num2;
                     break;
-                case 'division':
+                case "division":
                     result = num1 / num2;
                     break;
                 default:
-                    console.log('No name')
+                    console.log("No name");
             }
             return result;
         }
@@ -325,62 +330,141 @@
         function validateIf(num1, num2, nodeName) {
             let result = false;
             switch (nodeName) {
-                case 'less':
-                    if(num1 < num2) {
-                        result = true
-                    } else {
+                case "less":
+                    if (num1 < num2) {
+                        result = true;
+                    }
+                    else {
                         result = false;
                     }
                     break;
-                case 'greater':
-                    if(num1 > num2) {
-                        result = true
-                    } else {
+                case "greater":
+                    if (num1 > num2) {
+                        result = true;
+                    }
+                    else {
                         result = false;
                     }
                     break;
-                case 'lessEqual':
-                    if(num1 <= num2) {
-                        result = true
-                    } else {
+                case "lessEqual":
+                    if (num1 <= num2) {
+                        result = true;
+                    }
+                    else {
                         result = false;
                     }
                     break;
-                case 'greaterEqual':
-                    if(num1 >= num2) {
-                        result = true
-                    } else {
+                case "greaterEqual":
+                    if (num1 >= num2) {
+                        result = true;
+                    }
+                    else {
                         result = false;
                     }
                     break;
-                case 'equal':
-                    if(num1 == num2) {
-                        result = true
-                    } else {
+                case "equal":
+                    if (num1 == num2) {
+                        result = true;
+                    }
+                    else {
                         result = false;
                     }
                     break;
                 default:
-                    console.log('No name')
+                    console.log("No name");
             }
             return result;
         }
 
         function validateFor(num1, num2) {
             let result = 0;
-            let message = '';
-            
+            let message = "";
             while (num1 < num2) {
                 num1++;
                 result++;
             }
-            console.log("res", result)
+            console.log("res", result);
             message = `Ciclos ${result}`;
             return message;
         }
-              
+
+        function javascriptToPython(variableName) {
+            const exportdata = editor.value.export();
+            const dataNodes = exportdata.drawflow.Home.data;
+            console.log("data nodes", dataNodes);
+            let num1 = null;
+            let num2 = null;
+            let total;
+            let assignName = variableName;
+            let pythonCode = '';
+
+            Object.entries(dataNodes).forEach(([, value]) => {
+                if (value.name === "number") {
+                    if (num1 == null && value.outputs.output_1.connections.length === 1) {
+                        num1 = value.data.number;
+                    }
+                    else if (num1 != null && value.outputs.output_1.connections.length === 1) {
+                        num2 = value.data.number;
+                    }
+                }               
+                if (value.name === "addition") {
+                    total = value.data.result;
+                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # addition = num1 + num2\n${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`;
+                }
+                if (value.name === "subtraction") {
+                    total = value.data.result;
+                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # subtraction = num1 - num2\n${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`;
+                }
+                if (value.name === "multiplication") {
+                    total = value.data.result;
+                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # multiplication = num1 * num2\n${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`;
+                }
+                if (value.name === "division") {
+                    total = value.data.result;
+                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # division = num1 / num2\n${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`;
+                }
+                if (value.name === "if") {
+                    let signOperator = returnComparasion(value.data.option);
+                    pythonCode = `if ${value.data.num1} ${signOperator} ${value.data.num2}:\n\t print(true)\nelse:\n\t print(false)`;
+                }
+                if (value.name === "for") {
+                    pythonCode = `for ${value.data.num1} in ${value.data.num2}:\n\t print('cicle')`;
+                }
+                jsToPython.value = pythonCode
+                return pythonCode;
+            });
+        }
+        
+        function returnComparasion(sign) {
+            let result = "";
+            switch (sign) {
+                case "less":
+                    result = "<";
+                    break;
+                case "greater":
+                    result = ">";
+                    break;
+                case "lessEqual":
+                    result = "<=";
+                    break;
+                case "greaterEqual":
+                    result = ">=";
+                    break;
+                case "equal":
+                    result = "==";
+                    break;
+                default:
+                    console.log("No name");
+            }
+            return result;
+        }
+
         return {
-            nodesList, drag, drop, allowDrop,
+            nodesList,
+            drag,
+            drop,
+            allowDrop,
+            jsToPython
         }
     }
 }
