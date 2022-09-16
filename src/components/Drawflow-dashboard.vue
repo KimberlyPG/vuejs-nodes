@@ -11,7 +11,7 @@
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
             </div>
             <div className="bg-white text-black w-1/4 flex">
-                <div>
+                <div className="w-full">
                     <div className="flex">
                         <img 
                         className="w-10"
@@ -22,16 +22,26 @@
                             Python code
                         </h3>
                     </div>
-                    <!-- <div className="text-gray-600" @change="javascriptToPython($event)">
-                        pyhon code..
-                    </div> -->
+
                     <div className="text-gray-600">
-                        pyhon code..
-                        <!-- <div class="code-print"></div> -->
-                        <p>{{jsToPython}}</p>
-                        <!-- <input type="text" disabled df-codep> -->
+                        <p>{{jsToPython.num1}}</p>
+                        <p>{{jsToPython.num2}}</p>
+                        <p>{{jsToPython.operation}}</p>
+                        <p>{{jsToPython.variable}}</p>
+                        <p>{{jsToPython.condition}}</p>
+                        <p className="ml-5">{{jsToPython.true}}</p>
+                        <p>{{jsToPython.else}}</p>
+                        <p className="ml-5">{{jsToPython.false}}</p>
+                        <p className="ml-5">{{jsToPython.result}}</p>
+                        <p className="text-sm mt-4 mb-2">{{jsToPythonCount.loop}}</p>
+
+                        <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
+                            <div v-for="i in jsToPythonCycle" :key="i.number">
+                                <p>{{ i.number + " "+ i.variable }}</p>
+                            </div>
+                        </div>
                     </div>
-            </div>
+                </div>
             </div>
         </div>
     </div>
@@ -111,6 +121,8 @@
         ]);
 
         const jsToPython = shallowRef('');
+        const jsToPythonCycle = shallowRef('');
+        const jsToPythonCount = shallowRef('');
         // const [jsToPython, setJsToPytho] = useState('')
 
         const editor = shallowRef({});
@@ -177,10 +189,11 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
+
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
-                console.log("nodeData", nodeData);
                 let variableName = "";
+
                 if (nodeData.name == "assign") {
                     variableName = nodeData.data.name;
                     if (nodeData.inputs.input_1.connections.length > 0) {
@@ -195,8 +208,8 @@
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
-                        console.log("node name", inputNodeName);
                         const outputTotal = parseInt(inputNodeData.data.result);
+
                         if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
                             total = outputTotal;
                             console.log("da", inputNodeData.data);
@@ -208,8 +221,6 @@
                             if (nodeOperationConnections.length > 0) {
                                 const operationValue = editor.value;
                                 const node_id = nodeOperation.outputs.output_1.connections[0].node;
-                                // const nodeAssignData = editor.value.getNodeFromId(node_id);
-                                // variableName = nodeAssignData.data.name;
                                 operationValue.updateNodeDataFromId(node_id, objectOperation);
                             }
                         }
@@ -250,6 +261,7 @@
                     }
                 }
             });
+
             editor.value.on("connectionCreated", (data) => {
                 const output = editor.value.getNodeFromId(data.output_id);
                 const outputNumber = parseInt(output.data.number);
@@ -379,24 +391,32 @@
         function validateFor(num1, num2) {
             let result = 0;
             let message = "";
+            let jsonArr = [];
             while (num1 < num2) {
+                jsonArr.push({
+                    number: `${result}`,
+                    variable: 'Hello world!'
+                })
                 num1++;
                 result++;
+
             }
-            console.log("res", result);
-            message = `Ciclos ${result}`;
+            message = `Executed: ${result} times`;
+            jsToPythonCycle.value = jsonArr;
+            console.log("arr", jsonArr)
             return message;
         }
 
         function javascriptToPython(variableName) {
             const exportdata = editor.value.export();
             const dataNodes = exportdata.drawflow.Home.data;
-            console.log("data nodes", dataNodes);
+
             let num1 = null;
             let num2 = null;
             let total;
             let assignName = variableName;
             let pythonCode = '';
+            let pythonCodePrint = '';
 
             Object.entries(dataNodes).forEach(([, value]) => {
                 if (value.name === "number") {
@@ -409,32 +429,66 @@
                 }               
                 if (value.name === "addition") {
                     total = value.data.result;
-                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # addition = num1 + num2\n${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`;
+                    pythonCode = {
+                        num1: `num1 = ${num1 == null ? 0 : num1}`,
+                        num2: `num2 = ${num2 == null ? 0 : num2}`,
+                        operation: "# addition = num1 + num2",
+                        variable: `${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`
+                    }
                 }
                 if (value.name === "subtraction") {
                     total = value.data.result;
-                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # subtraction = num1 - num2\n${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`;
+                    pythonCode = {
+                        num1: `num1 = ${num1 == null ? 0 : num1}`,
+                        num2: `num2 = ${num2 == null ? 0 : num2}`,
+                        operation: "# subtraction = num1 - num2",
+                        variable: `${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`
+                    }
                 }
                 if (value.name === "multiplication") {
                     total = value.data.result;
-                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # multiplication = num1 * num2\n${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`;
+                    pythonCode = {
+                        num1: `num1 = ${num1 == null ? 0 : num1}`,
+                        num2: `num2 = ${num2 == null ? 0 : num2}`,
+                        operation: "# multiplication = num1 * num2",
+                        variable: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`
+                    }
                 }
                 if (value.name === "division") {
                     total = value.data.result;
-                    pythonCode = `num1 = ${num1 == null ? 0 : num1}\n num2 = ${num2 == null ? 0 : num2}\n # division = num1 / num2\n${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`;
+                    pythonCode = {
+                        num1: `num1 = ${num1 == null ? 0 : num1}`,
+                        num2: `num2 = ${num2 == null ? 0 : num2}`,
+                        operation: "# division = num1 / num2",
+                        variable: `${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`
+                    }
                 }
                 if (value.name === "if") {
                     let signOperator = returnComparasion(value.data.option);
-                    pythonCode = `if ${value.data.num1} ${signOperator} ${value.data.num2}:\n\t print(true)\nelse:\n\t print(false)`;
+                    pythonCode = {
+                        condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
+                        true: "print(true)",
+                        else: "else:",
+                        false:"print(false)" 
+                    }
                 }
                 if (value.name === "for") {
-                    pythonCode = `for ${value.data.num1} in ${value.data.num2}:\n\t print('cicle')`;
+                    pythonCode = {
+                        condition: `for ${value.data.num1} in ${value.data.num2}:`,
+                        result: `print('Hello world!')`,
+                    }
                 }
-                jsToPython.value = pythonCode
+                if(value.name === "nodeCondition") {
+                    pythonCodePrint = {
+                        loop: `${value.data.assign}`
+                    }
+                }
+                jsToPython.value = pythonCode;
+                jsToPythonCount.value = pythonCodePrint;
                 return pythonCode;
             });
         }
-        
+
         function returnComparasion(sign) {
             let result = "";
             switch (sign) {
@@ -464,7 +518,9 @@
             drag,
             drop,
             allowDrop,
-            jsToPython
+            jsToPython,
+            jsToPythonCount,
+            jsToPythonCycle
         }
     }
 }
