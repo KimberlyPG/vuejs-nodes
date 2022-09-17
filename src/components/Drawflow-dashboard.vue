@@ -1,5 +1,13 @@
 <template>
     <div className="h-full mx-2">
+        <div className="flex justify-end mb-3 text-lg">
+            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md">Save</button>
+            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" name="" id="">
+                <option value="">Select program</option>
+                <option value=""> Program 1</option>
+                <option value="">Program 2</option>
+            </select>
+        </div>
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
@@ -191,6 +199,8 @@
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
 
             editor.value.on("nodeDataChanged", (data) => {
+                saveFile();
+
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
 
@@ -464,7 +474,7 @@
                     }
                 }
                 if (value.name === "if") {
-                    let signOperator = returnComparasion(value.data.option);
+                    let signOperator = value.data.option;
                     pythonCode = {
                         condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
                         true: "print(true)",
@@ -489,29 +499,22 @@
             });
         }
 
-        function returnComparasion(sign) {
-            let result = "";
-            switch (sign) {
-                case "less":
-                    result = "<";
-                    break;
-                case "greater":
-                    result = ">";
-                    break;
-                case "lessEqual":
-                    result = "<=";
-                    break;
-                case "greaterEqual":
-                    result = ">=";
-                    break;
-                case "equal":
-                    result = "==";
-                    break;
-                default:
-                    console.log("No name");
-            }
-            return result;
-        }
+        const  saveFile = async()=>{
+            fetch('https://blue-surf-600108.us-east-1.aws.cloud.dgraph.io/graphql', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    id: 1,
+                    title: 'foo',
+                    body: 'bar',
+                    userId: 1,
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            })
+        .then((response) => response.json())
+        .then((json) => console.log(json));
+      }
 
         return {
             nodesList,
