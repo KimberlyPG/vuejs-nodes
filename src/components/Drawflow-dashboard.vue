@@ -1,12 +1,15 @@
 <template>
     <div className="h-full mx-2">
         <div className="flex justify-end mb-3 text-lg">
-            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md">Save</button>
+            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData">
+                Save
+            </button>
             <select className="w-40 bg-blue-400 text-gray-100 rounded-md" name="" id="">
                 <option value="">Select program</option>
                 <option value=""> Program 1</option>
                 <option value="">Program 2</option>
             </select>
+            <button @click="PutNodes">show</button>
         </div>
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
@@ -67,6 +70,7 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
+    import axios from 'axios'
 
     export default {
     name: "DrawflowDashboard",
@@ -131,7 +135,8 @@
         const jsToPython = shallowRef('');
         const jsToPythonCycle = shallowRef('');
         const jsToPythonCount = shallowRef('');
-        // const [jsToPython, setJsToPytho] = useState('')
+        const showNodes = shallowRef('');
+        console.log("shownodes", showNodes)
 
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
@@ -199,7 +204,7 @@
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
 
             editor.value.on("nodeDataChanged", (data) => {
-                saveFile();
+               getData();
 
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
@@ -222,7 +227,6 @@
 
                         if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
                             total = outputTotal;
-                            console.log("da", inputNodeData.data);
                             const objectOperation = {
                                 assign: total
                             };
@@ -281,6 +285,7 @@
                 const nodeName = inputData.name;
                 const conditionName = output.name;
                 let variableName = "";
+
                 if (nodeName !== "assign") {
                     if (nodeDataOuput == "input_1") {
                         num1 = outputNumber;
@@ -413,7 +418,6 @@
             }
             message = `Executed: ${result} times`;
             jsToPythonCycle.value = jsonArr;
-            console.log("arr", jsonArr)
             return message;
         }
 
@@ -499,22 +503,44 @@
             });
         }
 
-        const  saveFile = async()=>{
-            fetch('https://blue-surf-600108.us-east-1.aws.cloud.dgraph.io/graphql', {
-                method: 'PUT',
-                body: JSON.stringify({
-                    id: 1,
-                    title: 'foo',
-                    body: 'bar',
-                    userId: 1,
-                }),
+        function EditorData () {
+            const exportdata = editor.value.export();
+            const dataNodes = exportdata.drawflow.Home.data;
+
+            console.log("data", exportdata.drawflow)
+            showNodes.value = dataNodes;
+            console.log("ref", showNodes)
+            return dataNodes;
+        }
+
+        function PutNodes() {
+            // console.log("show", showNodes.value)
+            this.editor.import(JSON.stringify(showNodes.value));
+
+        }
+
+        const  getData = async()=>{
+            fetch('http://localhost:5000/getAllPrograms', {
+                method: 'GET',
                 headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
+                    'Content-type': 'application/json',
                 },
             })
-        .then((response) => response.json())
-        .then((json) => console.log(json));
-      }
+            .then((response) => response.json())
+            .then((json) => console.log(json));
+        }
+
+        const  setData = async()=>{
+            axios('http://localhost:5000/setAllPrograms', {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: 
+                    JSON.stringify(EditorData())              
+            })
+        }
+        
 
         return {
             nodesList,
@@ -523,7 +549,10 @@
             allowDrop,
             jsToPython,
             jsToPythonCount,
-            jsToPythonCycle
+            jsToPythonCycle,
+            setData,
+            showNodes,
+            PutNodes
         }
     }
 }
