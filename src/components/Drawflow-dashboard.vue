@@ -10,6 +10,7 @@
                 <option value="">Program 2</option>
             </select>
             <button @click="PutNodes">show</button>
+            <button @click="getData">GET</button>
         </div>
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
@@ -70,7 +71,7 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    import axios from 'axios'
+    // import axios from 'axios'
 
     export default {
     name: "DrawflowDashboard",
@@ -136,7 +137,6 @@
         const jsToPythonCycle = shallowRef('');
         const jsToPythonCount = shallowRef('');
         const showNodes = shallowRef('');
-        console.log("shownodes", showNodes)
 
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
@@ -202,6 +202,8 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
+            editor.value.registerNode("importedNodes", showNodes, {}, {})
+            console.log("register node", editor.value.noderegister);
 
             editor.value.on("nodeDataChanged", (data) => {
                getData();
@@ -256,7 +258,7 @@
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
                             const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
-                                assign: conditionResult
+                                ifResult: conditionResult
                             };
                             const operationValue = editor.value;
                             const input_id = inputNodeData.id;
@@ -265,7 +267,7 @@
                         if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
                             const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
                             const objectOperation = {
-                                assign: conditionResult
+                                forResult: conditionResult
                             };
                             const operationValue = editor.value;
                             const input_id = inputNodeData.id;
@@ -314,7 +316,7 @@
                 if (nodeName === "nodeCondition" && conditionName === "if") {
                     const conditionResult = validateIf(parseInt(output.data.num1), parseInt(output.data.num2), output.data.option);
                     const objectOperation = {
-                        assign: conditionResult
+                        conditionResult: conditionResult
                     };
                     const operationValue = editor.value;
                     const input_id = editor.value.getNodeFromId(data.input_id).id;
@@ -323,7 +325,7 @@
                 if (nodeName === "nodeCondition" && conditionName === "for") {
                     const conditionResult = validateFor(parseInt(output.data.num1), parseInt(output.data.num2));
                     const objectOperation = {
-                        assign: conditionResult
+                        conditionResult: conditionResult
                     };
                     const operationValue = editor.value;
                     const input_id = editor.value.getNodeFromId(data.input_id).id;
@@ -355,46 +357,46 @@
         }
 
         function validateIf(num1, num2, nodeName) {
-            let result = false;
+            let result = 'false';
             switch (nodeName) {
-                case "less":
+                case "<":
                     if (num1 < num2) {
-                        result = true;
+                        result = 'true';
                     }
                     else {
-                        result = false;
+                        result = 'false';
                     }
                     break;
-                case "greater":
+                case ">":
                     if (num1 > num2) {
-                        result = true;
+                        result = 'true';
                     }
                     else {
-                        result = false;
+                        result = 'false';
                     }
                     break;
-                case "lessEqual":
+                case "<=":
                     if (num1 <= num2) {
-                        result = true;
+                        result = 'true';
                     }
                     else {
-                        result = false;
+                        result = 'false';
                     }
                     break;
-                case "greaterEqual":
+                case ">=":
                     if (num1 >= num2) {
-                        result = true;
+                        result = 'true';
                     }
                     else {
-                        result = false;
+                        result = 'false';
                     }
                     break;
-                case "equal":
+                case "=":
                     if (num1 == num2) {
-                        result = true;
+                        result = 'true';
                     }
                     else {
-                        result = false;
+                        result = 'false';
                     }
                     break;
                 default:
@@ -494,7 +496,7 @@
                 }
                 if(value.name === "nodeCondition") {
                     pythonCodePrint = {
-                        loop: `${value.data.assign}`
+                        loop: `${value.data.conditionResult}`
                     }
                 }
                 jsToPython.value = pythonCode;
@@ -505,21 +507,19 @@
 
         function EditorData () {
             const exportdata = editor.value.export();
-            const dataNodes = exportdata.drawflow.Home.data;
+            const dataNodes = exportdata;
+            const nodes = exportdata.drawflow.Home.data;
 
-            console.log("data", exportdata.drawflow)
-            showNodes.value = dataNodes;
-            console.log("ref", showNodes)
+            let nodesArray = []
+            Object.keys(nodes).forEach(function(i){
+                nodesArray.push(nodes[i]);
+            });
+            
+            dataNodes.drawflow.Home.data = nodesArray
             return dataNodes;
         }
 
-        function PutNodes() {
-            // console.log("show", showNodes.value)
-            this.editor.import(JSON.stringify(showNodes.value));
-
-        }
-
-        const  getData = async()=>{
+        const getData = async()=>{
             fetch('http://localhost:5000/getAllPrograms', {
                 method: 'GET',
                 headers: {
@@ -527,18 +527,42 @@
                 },
             })
             .then((response) => response.json())
-            .then((json) => console.log(json));
+            .then((json) => importNodeData(json))
         }
 
         const  setData = async()=>{
-            axios('http://localhost:5000/setAllPrograms', {
+            fetch('http://localhost:5000/setAllPrograms', {
                 method: "POST",
                 headers: {
                     'Content-type': 'application/json',
                 },
                 body: 
-                    JSON.stringify(EditorData())              
+                    // JSON.stringify({
+                    //     node: 'node30'
+                    // })
+                    JSON.stringify(EditorData())         
             })
+        }
+
+        function importNodeData(json){
+            const data =  json.get[0]
+            // console.log("array", array)
+            // array.data?.map(item => JSON.stringify(item))
+            // console.log("nodes", json.get[0])
+
+
+            const ob = {drawflow: {
+                    Home: {
+                        data
+                    }
+                }
+            }
+            console.log("ob", ob)
+            PutNodes(ob);
+        }
+
+        function PutNodes(ob) {
+            editor.value.import(ob);
         }
         
 
@@ -552,7 +576,8 @@
             jsToPythonCycle,
             setData,
             showNodes,
-            PutNodes
+            PutNodes,
+            getData
         }
     }
 }
