@@ -426,6 +426,8 @@
         function javascriptToPython(variableName) {
             const exportdata = editor.value.export();
             const dataNodes = exportdata.drawflow.Home.data;
+            const data = exportdata
+            console.log("exportdata", data)
 
             let num1 = null;
             let num2 = null;
@@ -514,6 +516,7 @@
             Object.keys(nodes).forEach(function(i){
                 nodesArray.push(nodes[i]);
             });
+            console.log("new array", nodesArray)
             
             dataNodes.drawflow.Home.data = nodesArray
             return dataNodes;
@@ -537,19 +540,15 @@
                     'Content-type': 'application/json',
                 },
                 body: 
-                    // JSON.stringify({
-                    //     node: 'node30'
-                    // })
                     JSON.stringify(EditorData())         
             })
         }
 
         function importNodeData(json){
-            const data =  json.get[0]
-            // console.log("array", array)
-            // array.data?.map(item => JSON.stringify(item))
-            // console.log("nodes", json.get[0])
+            const dataarray =  json.get[0].data
 
+            const data = Object.assign({}, dataarray )
+            console.log("data",data)
 
             const ob = {drawflow: {
                     Home: {
@@ -557,12 +556,13 @@
                     }
                 }
             }
-            console.log("ob", ob)
-            PutNodes(ob);
+            showNodes.value = ob;
+            console.log("get", showNodes.value)
         }
 
-        function PutNodes(ob) {
-            editor.value.import(ob);
+        function PutNodes() {
+            console.log("state nodes", showNodes.value)
+            editor.value.import(showNodes.value);
         }
         
 
