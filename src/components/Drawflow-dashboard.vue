@@ -531,7 +531,7 @@
                 },
             })
             .then((response) => response.json())
-            .then((json) => importNodeData(json))
+            // .then((json) => importNodeData(json))
         }
 
         const  setData = async()=>{
@@ -542,33 +542,33 @@
                 },
                 body: 
                     JSON.stringify(EditorData())         
-            })
+            }).then(console.log(EditorData()))
         }
 
-        function importNodeData(json){
-            console.log("json dg", json)
-            const dataArray =  json.get[0].data
+        // function importNodeData(json){
+        //     console.log("json dg", json)
+        //     const dataArray =  json.get[0].data
 
-            let newObject = {}
-            for( var i=1; i < dataArray.length+1; i++) {
-                newObject[i] = dataArray[i-1]
-            }
-            console.log("newObject", newObject)
+        //     let newObject = {}
+        //     for( var i=1; i < dataArray.length+1; i++) {
+        //         newObject[i] = dataArray[i-1]
+        //     }
+        //     console.log("newObject", newObject)
             
-            let data = newObject
-            // for( var j=1; j < dataArray.length+1; j++) {
-            //      Object.assign({}, newObject[1].data[0])
-            // // }
+        //     let data = newObject
+        //     // for( var j=1; j < dataArray.length+1; j++) {
+        //     //      Object.assign({}, newObject[1].data[0])
+        //     // // }
 
-            const ob = {drawflow: {
-                    Home: {
-                        data
-                    }
-                }
-            }
-            showNodes.value = ob;
-            console.log("get", showNodes.value)
-        }
+        //     const ob = {drawflow: {
+        //             Home: {
+        //                 data
+        //             }
+        //         }
+        //     }
+        //     showNodes.value = ob;
+        //     console.log("get", showNodes.value)
+        // }
 
         function PutNodes() {
             console.log("state nodes", showNodes.value)
