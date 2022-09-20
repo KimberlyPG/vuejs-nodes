@@ -10,7 +10,7 @@
                 <option value="">Program 2</option>
             </select>
             <button @click="PutNodes">show</button>
-            <button @click="getData">GET</button>
+            <button @click="importNodeData">GET</button>
         </div>
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
@@ -203,7 +203,6 @@
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
             editor.value.registerNode("importedNodes", showNodes, {}, {})
-            console.log("register node", editor.value.noderegister);
 
             editor.value.on("nodeDataChanged", (data) => {
                getData();
@@ -517,7 +516,11 @@
             });
 
             let jsonFormat = {
-                nodesData
+                drawflow: {
+                    Home: {
+                        nodesData
+                    }
+                }
             }
 
             return jsonFormat;
@@ -545,30 +548,194 @@
             }).then(console.log(EditorData()))
         }
 
-        // function importNodeData(json){
-        //     console.log("json dg", json)
-        //     const dataArray =  json.get[0].data
+        
+        function importNodeData(){
+            const json = {
+            "Home": {
+                "uid": "0x26128373",
+                "data": [
+                    {
+                        "id": 2,
+                        "data": [{
+                            "uid": "0x26128373",
+                            "number": "2"
+                        }],
+                        "class": "number",
+                        "html": "number",
+                        "typenode": "vue",
+                        "inputs": {},
+                        "outputs": {
+                            "output_1": {
+                                "connections": [
+                                    {
+                                        "node": "3",
+                                        "output": "input_2"
+                                    }
+                                ]
+                            }
+                        },
+                        "name": "number",
+                        "pos_x": 73,
+                        "pos_y": 166
+                    },
+                    {
+                        "id": 3,
+                        "name": "addition",
+                        "data": [{
+                            "result": 5
+                        }],
+                        "class": "addition",
+                        "html": "addition",
+                        "typenode": "vue",
+                        "inputs": {
+                            "input_1": {
+                                "connections": [
+                                    {
+                                        "node": "1",
+                                        "input": "output_1"
+                                    }
+                                ]
+                            },
+                            "input_2": {
+                                "connections": [
+                                    {
+                                        "node": "2",
+                                        "input": "output_1"
+                                    }
+                                ]
+                            }
+                        },
+                        "outputs": {
+                            "output_1": {
+                                "connections": [
+                                    {
+                                        "node": "4",
+                                        "output": "input_1"
+                                    }
+                                ]
+                            }
+                        },
+                        "pos_x": 274,
+                        "pos_y": 111
+                    },
+                    {
+                        "name": "number",
+                        "data": [{
+                            "number": "3"
+                        }],
+                        "class": "number",
+                        "html": "number",
+                        "typenode": "vue",
+                        "inputs": {},
+                        "id": 1,
+                        "outputs": {
+                            "output_1": {
+                                "connections": [
+                                    {
+                                        "node": "3",
+                                        "output": "input_1"
+                                    }
+                                ]
+                            }
+                        },
+                        "pos_x": 67,
+                        "pos_y": 62
+                    },
+                    {
+                        "id": 4,
+                        "name": "assign",
+                        "data":[{
+                            "assign": 5},
+                            {"name": "wei"}
+                        ],
+                        "class": "assign",
+                        "html": "assign",
+                        "typenode": "vue",
+                        "inputs": {
+                            "input_1": {
+                                "connections": [
+                                    {
+                                        "node": "3",
+                                        "input": "output_1"
+                                    }
+                                ]
+                            }
+                        },
+                        "outputs": {},
+                        "pos_x": 542,
+                        "pos_y": 116
+                    },
+                    {
+                        "id": 5,
+                        "name": "if",
+                        "data": [
+                            {num1: "2"},
+                            {option: "<"},
+                            {num2: "4"}
+                        ],
+                        "class": "if",
+                        "html": "if",
+                        "typenode": "vue",
+                        "inputs": {},
+                        "outputs": {
+                            "output_1": {
+                                "connections": [
+                                    {
+                                        "node": "7",
+                                        "output": "input_1"
+                                    }
+                                ]
+                            }
+                        },
+                        "pos_x": 93,
+                        "pos_y": 307
+                    }]
+                }
+            }
+            const dataArray =  json.Home.data                   
+            const arrayofData = [];
+            const arrayOfNodesNew = [];
+            dataArray.map((value) => {
+                const pos1 = value.data[0];
+                const pos2 = value.data[1];
+                const pos3 = value.data[2];
+                const newData = {
+                    ...pos1,
+                    ...pos2,
+                    ...pos3
+                }
+                arrayofData.push(newData);
+            })
 
-        //     let newObject = {}
-        //     for( var i=1; i < dataArray.length+1; i++) {
-        //         newObject[i] = dataArray[i-1]
-        //     }
-        //     console.log("newObject", newObject)
+            dataArray.forEach((value, index) => {
+                const newData = {
+                    ...value,
+                    data: arrayofData[index]
+                }
+
+                arrayOfNodesNew.push(newData);
+            })
+
+            console.log('Last final: ', arrayOfNodesNew);
             
-        //     let data = newObject
-        //     // for( var j=1; j < dataArray.length+1; j++) {
-        //     //      Object.assign({}, newObject[1].data[0])
-        //     // // }
+            let newObject = {}
+            for( var i=1; i < arrayOfNodesNew.length+1; i++) {
+                newObject[i] = arrayOfNodesNew[i-1]
+            }
+            console.log("newObject", newObject)
+            
+            let data = newObject
 
-        //     const ob = {drawflow: {
-        //             Home: {
-        //                 data
-        //             }
-        //         }
-        //     }
-        //     showNodes.value = ob;
-        //     console.log("get", showNodes.value)
-        // }
+            const ob = {drawflow: {
+                    Home: {
+                        data
+                    }
+                }
+            }
+
+            showNodes.value = ob;
+            console.log("get", showNodes.value)
+        }
 
         function PutNodes() {
             console.log("state nodes", showNodes.value)
@@ -588,6 +755,7 @@
             showNodes,
             PutNodes,
             getData,
+            importNodeData
         }
     }
 }
