@@ -509,17 +509,18 @@
 
         function EditorData () {
             const exportdata = editor.value.export();
-            const dataNodes = exportdata;
             const nodes = exportdata.drawflow.Home.data;
-
-            let nodesArray = []
+           
+            let nodesData = []
             Object.keys(nodes).forEach(function(i){
-                nodesArray.push(nodes[i]);
+                nodesData.push(nodes[i]);
             });
-            console.log("new array", nodesArray)
-            
-            dataNodes.drawflow.Home.data = nodesArray
-            return dataNodes;
+
+            let jsonFormat = {
+                nodesData
+            }
+
+            return jsonFormat;
         }
 
         const getData = async()=>{
@@ -545,10 +546,19 @@
         }
 
         function importNodeData(json){
-            const dataarray =  json.get[0].data
+            console.log("json dg", json)
+            const dataArray =  json.get[0].data
 
-            const data = Object.assign({}, dataarray )
-            console.log("data",data)
+            let newObject = {}
+            for( var i=1; i < dataArray.length+1; i++) {
+                newObject[i] = dataArray[i-1]
+            }
+            console.log("newObject", newObject)
+            
+            let data = newObject
+            // for( var j=1; j < dataArray.length+1; j++) {
+            //      Object.assign({}, newObject[1].data[0])
+            // // }
 
             const ob = {drawflow: {
                     Home: {
@@ -577,7 +587,7 @@
             setData,
             showNodes,
             PutNodes,
-            getData
+            getData,
         }
     }
 }
