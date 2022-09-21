@@ -10,7 +10,7 @@
                 <option value="">Program 2</option>
             </select>
             <button @click="PutNodes">show</button>
-            <button @click="importNodeData">GET</button>
+            <button @click="getData">GET</button>
         </div>
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
@@ -205,13 +205,13 @@
             editor.value.registerNode("importedNodes", showNodes, {}, {})
 
             editor.value.on("nodeDataChanged", (data) => {
-               getData();
+               // getData();
 
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
 
                 if (nodeData.name == "assign") {
-                    variableName = nodeData.data.name;
+                    variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         javascriptToPython(variableName);
                     }
@@ -228,14 +228,21 @@
 
                         if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
                             total = outputTotal;
-                            const objectOperation = {
-                                assign: total
-                            };
                             const nodeOperation = editor.value.getNodeFromId(outputNode[0].node);
+                            
+                            
                             const nodeOperationConnections = nodeOperation.outputs.output_1.connections;
                             if (nodeOperationConnections.length > 0) {
                                 const operationValue = editor.value;
                                 const node_id = nodeOperation.outputs.output_1.connections[0].node;
+                                const nodeAssignData = editor.value.getNodeFromId(node_id).data;
+                                console.log('1:', nodeAssignData);
+                                const objectOperation = {
+                                    ...nodeAssignData,
+                                    assign: total
+                                };
+
+                                console.log('2:', editor.value.export());
                                 operationValue.updateNodeDataFromId(node_id, objectOperation);
                             }
                         }
@@ -257,7 +264,7 @@
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
                             const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
-                                ifResult: conditionResult
+                                conditionResult: conditionResult
                             };
                             const operationValue = editor.value;
                             const input_id = inputNodeData.id;
@@ -266,7 +273,7 @@
                         if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
                             const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
                             const objectOperation = {
-                                forResult: conditionResult
+                                conditionResult: conditionResult
                             };
                             const operationValue = editor.value;
                             const input_id = inputNodeData.id;
@@ -303,9 +310,12 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
                 else {
-                    variableName = inputData.data.name;
+                    variableName = inputData.data.variable;                  
                     total = outputTotal;
+                    const jsonWIthValues = inputData.data;
+                    console.log('Json with values' ,jsonWIthValues);
                     const objectOperation = {
+                        ...jsonWIthValues, 
                         assign: total
                     };
                     const operationValue = editor.value;
@@ -313,8 +323,10 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
                 if (nodeName === "nodeCondition" && conditionName === "if") {
+                    const jsonWIthValues = inputData.data;
                     const conditionResult = validateIf(parseInt(output.data.num1), parseInt(output.data.num2), output.data.option);
                     const objectOperation = {
+                        ...jsonWIthValues,
                         conditionResult: conditionResult
                     };
                     const operationValue = editor.value;
@@ -322,8 +334,10 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
                 if (nodeName === "nodeCondition" && conditionName === "for") {
+                    const jsonWIthValues = inputData.data;
                     const conditionResult = validateFor(parseInt(output.data.num1), parseInt(output.data.num2));
                     const objectOperation = {
+                        ...jsonWIthValues,
                         conditionResult: conditionResult
                     };
                     const operationValue = editor.value;
@@ -425,8 +439,6 @@
         function javascriptToPython(variableName) {
             const exportdata = editor.value.export();
             const dataNodes = exportdata.drawflow.Home.data;
-            const data = exportdata
-            console.log("exportdata", data)
 
             let num1 = null;
             let num2 = null;
@@ -509,21 +521,14 @@
         function EditorData () {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
+
+            console.log('Editor data: ', exportdata);
            
             let nodesData = []
             Object.keys(nodes).forEach(function(i){
                 nodesData.push(nodes[i]);
             });
-
-            let jsonFormat = {
-                drawflow: {
-                    Home: {
-                        nodesData
-                    }
-                }
-            }
-
-            return jsonFormat;
+            return {nodesData};
         }
 
         const getData = async()=>{
@@ -534,7 +539,7 @@
                 },
             })
             .then((response) => response.json())
-            // .then((json) => importNodeData(json))
+            .then((json) => importNodeData(json))
         }
 
         const  setData = async()=>{
@@ -548,181 +553,47 @@
             }).then(console.log(EditorData()))
         }
 
-        
-        function importNodeData(){
-            const json = {
-            "Home": {
-                "uid": "0x26128373",
-                "data": [
-                    {
-                        "id": 2,
-                        "data": [{
-                            "uid": "0x26128373",
-                            "number": "2"
-                        }],
-                        "class": "number",
-                        "html": "number",
-                        "typenode": "vue",
-                        "inputs": {},
-                        "outputs": {
-                            "output_1": {
-                                "connections": [
-                                    {
-                                        "node": "3",
-                                        "output": "input_2"
-                                    }
-                                ]
-                            }
-                        },
-                        "name": "number",
-                        "pos_x": 73,
-                        "pos_y": 166
-                    },
-                    {
-                        "id": 3,
-                        "name": "addition",
-                        "data": [{
-                            "result": 5
-                        }],
-                        "class": "addition",
-                        "html": "addition",
-                        "typenode": "vue",
-                        "inputs": {
-                            "input_1": {
-                                "connections": [
-                                    {
-                                        "node": "1",
-                                        "input": "output_1"
-                                    }
-                                ]
-                            },
-                            "input_2": {
-                                "connections": [
-                                    {
-                                        "node": "2",
-                                        "input": "output_1"
-                                    }
-                                ]
-                            }
-                        },
-                        "outputs": {
-                            "output_1": {
-                                "connections": [
-                                    {
-                                        "node": "4",
-                                        "output": "input_1"
-                                    }
-                                ]
-                            }
-                        },
-                        "pos_x": 274,
-                        "pos_y": 111
-                    },
-                    {
-                        "name": "number",
-                        "data": [{
-                            "number": "3"
-                        }],
-                        "class": "number",
-                        "html": "number",
-                        "typenode": "vue",
-                        "inputs": {},
-                        "id": 1,
-                        "outputs": {
-                            "output_1": {
-                                "connections": [
-                                    {
-                                        "node": "3",
-                                        "output": "input_1"
-                                    }
-                                ]
-                            }
-                        },
-                        "pos_x": 67,
-                        "pos_y": 62
-                    },
-                    {
-                        "id": 4,
-                        "name": "assign",
-                        "data":[{
-                            "assign": 5},
-                            {"name": "wei"}
-                        ],
-                        "class": "assign",
-                        "html": "assign",
-                        "typenode": "vue",
-                        "inputs": {
-                            "input_1": {
-                                "connections": [
-                                    {
-                                        "node": "3",
-                                        "input": "output_1"
-                                    }
-                                ]
-                            }
-                        },
-                        "outputs": {},
-                        "pos_x": 542,
-                        "pos_y": 116
-                    },
-                    {
-                        "id": 5,
-                        "name": "if",
-                        "data": [
-                            {num1: "2"},
-                            {option: "<"},
-                            {num2: "4"}
-                        ],
-                        "class": "if",
-                        "html": "if",
-                        "typenode": "vue",
-                        "inputs": {},
-                        "outputs": {
-                            "output_1": {
-                                "connections": [
-                                    {
-                                        "node": "7",
-                                        "output": "input_1"
-                                    }
-                                ]
-                            }
-                        },
-                        "pos_x": 93,
-                        "pos_y": 307
-                    }]
-                }
-            }
-            const dataArray =  json.Home.data                   
-            const arrayofData = [];
+        function importNodeData(json){
+            console.log('get data: ', json);
+            const arrayDropdown = [];
+
+            json.get.forEach((element) => {
+                arrayDropdown.push(element.uid);
+            })
+
+            const jsonOption = json.get[2].nodesData;
             const arrayOfNodesNew = [];
-            dataArray.map((value) => {
-                const pos1 = value.data[0];
-                const pos2 = value.data[1];
-                const pos3 = value.data[2];
-                const newData = {
-                    ...pos1,
-                    ...pos2,
-                    ...pos3
+            jsonOption.forEach((value) => {
+                // console.log('Boolean: ', !!value.inputs);
+                let newData;
+                // eslint-disable-next-line no-extra-boolean-cast
+                if(!!value.inputs === false) {
+                    newData = {
+                        ...value,
+                        inputs: {}
+                    }
+                } else if (!!value.outputs === false) {
+                    newData = {
+                        ...value,
+                        outputs: {}
+                    }
+                } else if (!!value.data === false) {
+                    newData = {
+                        ...value,
+                        data: {}
+                    }
+                } else {
+                    newData = {
+                        ...value
+                    }
                 }
-                arrayofData.push(newData);
-            })
-
-            dataArray.forEach((value, index) => {
-                const newData = {
-                    ...value,
-                    data: arrayofData[index]
-                }
-
-                arrayOfNodesNew.push(newData);
-            })
-
-            console.log('Last final: ', arrayOfNodesNew);
+                    arrayOfNodesNew.push(newData);
+                })
             
             let newObject = {}
             for( var i=1; i < arrayOfNodesNew.length+1; i++) {
                 newObject[i] = arrayOfNodesNew[i-1]
             }
-            console.log("newObject", newObject)
             
             let data = newObject
 
@@ -733,12 +604,11 @@
                 }
             }
 
+            console.log('Object: ', ob);
             showNodes.value = ob;
-            console.log("get", showNodes.value)
         }
 
-        function PutNodes() {
-            console.log("state nodes", showNodes.value)
+        function PutNodes() {  
             editor.value.import(showNodes.value);
         }
         

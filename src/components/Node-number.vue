@@ -1,7 +1,7 @@
 <template>
     <div>
         <p className="text-sm">Number</p>
-        <input class="number-class w-full" type="number" df-number @change="updateSelect" />
+        <input class="number-class w-full" type="number" df-number />
     </div>
 </template>
 
