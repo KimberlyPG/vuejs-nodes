@@ -1,17 +1,16 @@
 <template>
     <div className="h-full mx-2">
+        <button @click="CleanEditor">Clean editor</button>
         <div className="flex justify-end mb-3 text-lg">
             <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData">
                 Save
             </button>
-            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" name="" id="">
-                <option value="">Select program</option>
-                <option value=""> Program 1</option>
-                <option value="">Program 2</option>
+            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" @click="getData" @change="valueSelected($event)">
+                    <option value="Select">Choose</option>
+                    <option v-for="j in programOptions" :key="j.id" :value="j.id">{{j.name}}</option>
             </select>
-            <button @click="PutNodes">show</button>
-            <button @click="getData">GET</button>
         </div>
+        
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
@@ -57,6 +56,7 @@
             </div>
         </div>
     </div>
+    
 </template>
 
 <script>
@@ -64,18 +64,17 @@
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css'
     import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
-    // import { useStore } from 'vuex'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    // import axios from 'axios'
+    // import {useStore} from 'vuex'
 
     export default {
-    name: "DrawflowDashboard",
-    setup() {
+        name: "DrawflowDashboard",
+    setup() {   
         const nodesList = readonly([
             {
                 name: "Number",
@@ -137,7 +136,10 @@
         const jsToPythonCycle = shallowRef('');
         const jsToPythonCount = shallowRef('');
         const showNodes = shallowRef('');
-
+        const programOptions = shallowRef('');
+        const optionSelected = shallowRef(0);
+        const jsonImport = shallowRef({});
+        
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
@@ -174,6 +176,13 @@
                 addNodeToDrawFlow(data, ev.clientX, ev.clientY); //node name, x pos, y pos
             }
         };
+
+        const valueSelected = (event) => {
+            optionSelected.value = event.target.value;
+            console.log(optionSelected.value)
+            showSelected();
+        }
+        
         // drop node into drarflow editor
         const addNodeToDrawFlow = (name, pos_x, pos_y) => {
             pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x
@@ -539,34 +548,29 @@
                 },
             })
             .then((response) => response.json())
-            .then((json) => importNodeData(json))
+            .then((json) => {
+                importNodeData(json);
+                jsonImport.value = json;
+            })
         }
-
-        const  setData = async()=>{
-            fetch('http://localhost:5000/setAllPrograms', {
-                method: "POST",
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                body: 
-                    JSON.stringify(EditorData())         
-            }).then(console.log(EditorData()))
-        }
-
+                    
         function importNodeData(json){
-            console.log('get data: ', json);
             const arrayDropdown = [];
 
-            json.get.forEach((element) => {
-                arrayDropdown.push(element.uid);
+            json.get.forEach((element, index) => {
+                arrayDropdown.push({id: index, name: element.uid});
             })
 
-            const jsonOption = json.get[2].nodesData;
-            const arrayOfNodesNew = [];
-            jsonOption.forEach((value) => {
-                // console.log('Boolean: ', !!value.inputs);
+            programOptions.value = arrayDropdown
+        }
+
+        function showSelected() {
+            const validate = jsonImport.value
+            if(!!validate == true){
+                const jsonOption = validate.get[optionSelected.value].nodesData;
+                const arrayOfNodesNew = [];
+                jsonOption.forEach((value) => {
                 let newData;
-                // eslint-disable-next-line no-extra-boolean-cast
                 if(!!value.inputs === false) {
                     newData = {
                         ...value,
@@ -590,28 +594,39 @@
                     arrayOfNodesNew.push(newData);
                 })
             
-            let newObject = {}
-            for( var i=1; i < arrayOfNodesNew.length+1; i++) {
-                newObject[i] = arrayOfNodesNew[i-1]
-            }
-            
-            let data = newObject
+                let newObject = {}
+                for( var i=1; i < arrayOfNodesNew.length+1; i++) {
+                    newObject[i] = arrayOfNodesNew[i-1]
+                }
+                
+                let data = newObject
 
-            const ob = {drawflow: {
-                    Home: {
-                        data
+                const ob = {drawflow: {
+                        Home: {
+                            data
+                        }
                     }
                 }
+
+                showNodes.value = ob;
+                editor.value.import(showNodes.value);
             }
-
-            console.log('Object: ', ob);
-            showNodes.value = ob;
         }
 
-        function PutNodes() {  
-            editor.value.import(showNodes.value);
+        const  setData = async()=>{
+            fetch('http://localhost:5000/setAllPrograms', {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                body: 
+                    JSON.stringify(EditorData())         
+            }).then(console.log(EditorData()))
         }
-        
+
+        function CleanEditor() {
+            editor.value.clear()
+        }
 
         return {
             nodesList,
@@ -623,9 +638,11 @@
             jsToPythonCycle,
             setData,
             showNodes,
-            PutNodes,
             getData,
-            importNodeData
+            importNodeData,
+            programOptions,
+            valueSelected,
+            CleanEditor
         }
     }
 }
