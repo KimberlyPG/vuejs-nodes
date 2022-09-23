@@ -44,8 +44,7 @@
                         <p>{{store.state.jsToPython.else}}</p>
                         <p className="ml-5">{{store.state.jsToPython.false}}</p>
                         <p className="ml-5">{{store.state.jsToPython.result}}</p>
-                        <!-- <p className="text-sm mt-4 mb-2">{{jsToPythonCount.loop}}</p> -->
-
+                        <p className="text-sm mt-4 mb-2">{{store.state.jsToPythonCount.loop}}</p>
                         <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
                             <div v-for="i in jsToPythonCycle" :key="i.number">
                                 <p>{{ i.number + " "+ i.variable }}</p>
@@ -55,14 +54,13 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+    </div>    
 </template>
 
 <script>
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
-    import styleDrawflow from 'drawflow/dist/drawflow.min.css'
+    import styleDrawflow from 'drawflow/dist/drawflow.min.css' 
     import { h, getCurrentInstance, render, readonly, onMounted, shallowRef} from 'vue'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
@@ -70,7 +68,7 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    // import {javascriptToPython} from '../javascriptToPython'
+    import {javascriptToPython} from '../javascriptToPython'
     import {useStore} from 'vuex'
 
     export default {
@@ -135,9 +133,7 @@
             },
         ]);
 
-        // const jsToPython = shallowRef('');
         const jsToPythonCycle = shallowRef('');
-        // const jsToPythonCount = shallowRef('');
         const showNodes = shallowRef('');
         const programOptions = shallowRef('');
         const optionSelected = shallowRef(0);
@@ -147,8 +143,8 @@
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
-        // const { dispatch } = useStore(); 
-        // position of the node
+
+
         let node_move_select = "";
         let node_last_move = null;
         // node taken
@@ -217,7 +213,6 @@
             editor.value.registerNode("importedNodes", showNodes, {}, {})
 
             editor.value.on("nodeDataChanged", (data) => {
-               // getData();
 
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
@@ -225,19 +220,19 @@
                 if (nodeData.name == "assign") {
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
-                        javascriptToPython(variableName);
-                        console.log("editor", editor.value.export())
+                        console.log("variableName change", variableName)
+                        javascriptToPython(variableName, editor.value.export());
                     }
                 }
                 else {
                     const outputNode = nodeData.outputs.output_1.connections;
                     if (outputNode.length > 0) {
-                        const outputNumber = parseInt(nodeData.data.number);
+                        const outputNumber = parseFloat(nodeData.data.number);
                         const nodeDataOuput = nodeData.outputs.output_1.connections[0].output;
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
-                        const outputTotal = parseInt(inputNodeData.data.result);
+                        const outputTotal = parseFloat(inputNodeData.data.result);
 
                         if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
                             total = outputTotal;
@@ -249,13 +244,11 @@
                                 const operationValue = editor.value;
                                 const node_id = nodeOperation.outputs.output_1.connections[0].node;
                                 const nodeAssignData = editor.value.getNodeFromId(node_id).data;
-                                console.log('1:', nodeAssignData);
                                 const objectOperation = {
                                     ...nodeAssignData,
                                     assign: total
                                 };
 
-                                console.log('2:', editor.value.export());
                                 operationValue.updateNodeDataFromId(node_id, objectOperation);
                             }
                         }
@@ -266,7 +259,7 @@
                             else if (nodeDataOuput == "input_2") {
                                 num2 = outputNumber;
                             }
-                            let result = operationValues(num1, num2, inputNodeName);
+                            let result = operationValues(num1, num2, inputNodeName, inputNodeData);
                             const objectOperation = {
                                 result: result
                             };
@@ -275,7 +268,7 @@
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
-                            const conditionResult = validateIf(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2), nodeData.data.option);
+                            const conditionResult = validateIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
                                 conditionResult: conditionResult
                             };
@@ -284,7 +277,7 @@
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
-                            const conditionResult = validateFor(parseInt(nodeData.data.num1), parseInt(nodeData.data.num2));
+                            const conditionResult = validateFor(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2));
                             const objectOperation = {
                                 conditionResult: conditionResult
                             };
@@ -292,16 +285,17 @@
                             const input_id = inputNodeData.id;
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
-                        javascriptToPython(variableName);
+                        console.log("variableName change2", variableName)
+                        javascriptToPython(variableName, editor.value.export());
                     }
                 }
             });
 
             editor.value.on("connectionCreated", (data) => {
                 const output = editor.value.getNodeFromId(data.output_id);
-                const outputNumber = parseInt(output.data.number);
+                const outputNumber = parseFloat(output.data.number);
                 const nodeDataOuput = output.outputs.output_1.connections[0].output;
-                const outputTotal = parseInt(output.data.result);
+                const outputTotal = parseFloat(output.data.result);
                 const inputData = editor.value.getNodeFromId(data.input_id);
                 const nodeName = inputData.name;
                 const conditionName = output.name;
@@ -314,7 +308,7 @@
                     else if (nodeDataOuput == "input_2") {
                         num2 = outputNumber;
                     }
-                    let result = operationValues(num1, num2, nodeName);
+                    let result = operationValues(num1, num2, nodeName, inputData);
                     const objectOperation = {
                         result: result
                     };
@@ -323,10 +317,10 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
                 else {
-                    variableName = inputData.data.variable;                  
+                    variableName = inputData.data.variable;                      
                     total = outputTotal;
                     const jsonWIthValues = inputData.data;
-                    console.log('Json with values' ,jsonWIthValues);
+
                     const objectOperation = {
                         ...jsonWIthValues, 
                         assign: total
@@ -337,7 +331,7 @@
                 }
                 if (nodeName === "nodeCondition" && conditionName === "if") {
                     const jsonWIthValues = inputData.data;
-                    const conditionResult = validateIf(parseInt(output.data.num1), parseInt(output.data.num2), output.data.option);
+                    const conditionResult = validateIf(parseFloat(output.data.num1), parseFloat(output.data.num2), output.data.option);
                     const objectOperation = {
                         ...jsonWIthValues,
                         conditionResult: conditionResult
@@ -348,7 +342,7 @@
                 }
                 if (nodeName === "nodeCondition" && conditionName === "for") {
                     const jsonWIthValues = inputData.data;
-                    const conditionResult = validateFor(parseInt(output.data.num1), parseInt(output.data.num2));
+                    const conditionResult = validateFor(parseFloat(output.data.num1), parseFloat(output.data.num2));
                     const objectOperation = {
                         ...jsonWIthValues,
                         conditionResult: conditionResult
@@ -357,24 +351,38 @@
                     const input_id = editor.value.getNodeFromId(data.input_id).id;
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
-                javascriptToPython(variableName);
+                javascriptToPython(variableName, editor.value.export());
             });
         });
 
-        function operationValues(num1, num2, nodeName) {
+        function operationValues(num1, num2, nodeName, node) {
             let result = 0;
+            let number1 = 0;
+            let number2 = 0;
+            if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length > 0) {
+                number1 = num1
+                number2 = num2
+            }
+            else if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length == 0) {
+                number1 = num1 
+                number2 = 0
+            } 
+            else if(node.inputs.input_1.connections.length == 0 && node.inputs.input_2.connections.length > 0) {
+                number1 = 0
+                number2 = num2
+            }
             switch (nodeName) {
                 case "addition":
-                    result = num1 + num2;
+                    result = number1 + number2;
                     break;
                 case "subtraction":
-                    result = num1 - num2;
+                    result = number1 - number2;
                     break;
                 case "multiplication":
-                    result = num1 * num2;
+                    result = number1 * number2;
                     break;
                 case "division":
-                    result = num1 / num2;
+                    result = number1 / number2;
                     break;
                 default:
                     console.log("No name");
@@ -448,96 +456,6 @@
             jsToPythonCycle.value = jsonArr;
             return message;
         }
-
-        function javascriptToPython(variableName) {
-        const exportdata = editor.value.export();
-        const dataNodes = exportdata.drawflow.Home.data;
-
-        let num1 = null;
-        let num2 = null;
-        let total;
-        let assignName = variableName;
-        let pythonCode = '';
-        let pythonCodePrint = '';
-
-        Object.entries(dataNodes).forEach(([, value]) => {
-            if (value.name === "number") {
-            if (num1 == null && value.outputs.output_1.connections.length === 1) {
-                num1 = value.data.number;
-            }
-            else if (num1 != null && value.outputs.output_1.connections.length === 1) {
-                num2 = value.data.number;
-            }
-        }
-                     
-        if (value.name === "addition") {
-            total = value.data.result;
-            assignName = value.data.variable
-            pythonCode = {
-                num1: `num1 = ${num1 == null ? 0 : num1}`,
-                num2: `num2 = ${num2 == null ? 0 : num2}`,
-                operation: "# addition = num1 + num2",
-                variable: `${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`
-            }
-        }
-        if (value.name === "subtraction") {
-            total = value.data.result;
-            assignName = value.data.variable
-            pythonCode = {
-                num1: `num1 = ${num1 == null ? 0 : num1}`,
-                num2: `num2 = ${num2 == null ? 0 : num2}`,
-                operation: "# subtraction = num1 - num2",
-                variable: `${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`
-            }
-        }
-        if (value.name === "multiplication") {
-            total = value.data.result;
-            assignName = value.data.variable
-            pythonCode = {
-                num1: `num1 = ${num1 == null ? 0 : num1}`,
-                num2: `num2 = ${num2 == null ? 0 : num2}`,
-                operation: "# multiplication = num1 * num2",
-                variable: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`
-            }
-        }
-        if (value.name === "division") {
-            total = value.data.result;
-            assignName = value.data.variable
-            pythonCode = {
-                num1: `num1 = ${num1 == null ? 0 : num1}`,
-                num2: `num2 = ${num2 == null ? 0 : num2}`,
-                operation: "# division = num1 / num2",
-                variable: `${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`
-            }
-        }
-        if (value.name === "if") {
-            let signOperator = value.data.option;
-            pythonCode = {
-                condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
-                true: "print(true)",
-                else: "else:",
-                false:"print(false)" 
-            }
-        }
-        if (value.name === "for") {
-            pythonCode = {
-                condition: `for ${value.data.num1} in ${value.data.num2}:`,
-                result: `print('Hello world!')`,
-            }
-        }
-        if(value.name === "nodeCondition") {
-            pythonCodePrint = {
-                loop: `${value.data.conditionResult}`
-            }
-        }
-        // jsToPython.value = pythonCode;
-        // jsToPythonCount.value = pythonCodePrint;
-        console.log("state", store.state.jsToPython)
-        store.commit('setJsToPython', pythonCode)
-        store.commit('setJsToPythonCount', pythonCodePrint)
-        return pythonCode;
-    });
-}
 
         function EditorData () {
             const exportdata = editor.value.export();

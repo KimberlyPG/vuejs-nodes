@@ -5,32 +5,34 @@
     </div>
 </template>
 
-<script>
-    // import { getCurrentInstance, ref, onMounted } from 'vue'
-    
+<script> 
+    // import { getCurrentInstance, onMounted, ref } from 'vue
+
     export default {
         name: 'NodeNumber',
-        // data() {
+        // data: () => {
         //     return {
-        //         number: 0
+        //         amount: 0
+
         //     }
         // },
-
         // setup() {
         //     const nodeId = ref(0);
-        //     // let df = null
-        
+     
         //     let df = getCurrentInstance().appContext.config.globalProperties.$df;
         //     console.log("$df", getCurrentInstance().appContext.config.globalProperties.$df)
                     
+        //     console.log(df.nodeId)
         //     onMounted(() => {
         //         nodeId.value = df.nodeId
+        //         console.log(nodeId.value)
         //     });
             
         //     return {
         //         df, nodeId
         //     }
-        // }           
+        // }        
     }
+    DataTransfer
 </script>
 

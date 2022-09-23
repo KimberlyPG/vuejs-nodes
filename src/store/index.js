@@ -4,6 +4,8 @@ const store = createStore({
     state: {
         jsToPython: '',
         jsToPythonCount: '',
+        num1: 0,
+        num2: 0
     },
     mutations: {
         setJsToPython(state, value)
@@ -13,6 +15,14 @@ const store = createStore({
         setJsToPythonCount(state, value) 
         {
             state.jsToPythonCount = value
+        },
+        setNum1(state, value)
+        {
+            state.num1 = value;
+        },
+        setNum2(state, value)
+        {
+            state.num2 = value;
         }
     },
     getters: {
