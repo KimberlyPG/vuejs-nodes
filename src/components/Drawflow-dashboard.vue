@@ -185,7 +185,7 @@
             * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
             // adding node to drawflow
             const nodeSelected = nodesList.find(object => object.item == name);
-            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {number: 0}, name, "vue");
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {number: 0, num1: 0, num2: 0}, name, "vue");
         };
         
         const valueSelected = (event) => {
@@ -253,7 +253,7 @@
                                 operationValue.updateNodeDataFromId(node_id, objectOperation);
                             }
                         }
-                        if (inputNodeName !== "assign") {
+                        if (inputNodeName !== "assign" && inputNodeName !== "nodeCondition") {
                             if (nodeDataOuput == "input_1") {
                                 num1 = outputNumber;
                             }
@@ -269,6 +269,7 @@
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
+                            console.log("num1", nodeData.data.num1, "num2", nodeData.data.num2)
                             const conditionResult = validateIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
                                 conditionResult: conditionResult
@@ -302,7 +303,8 @@
                 const conditionName = output.name;
                 let variableName = "";
 
-                if (nodeName !== "assign") {
+                console.log(nodeName)
+                if (nodeName !== "assign" && nodeName !== "nodeCondition") {
                     if (nodeDataOuput == "input_1") {
                         num1 = outputNumber;
                     }

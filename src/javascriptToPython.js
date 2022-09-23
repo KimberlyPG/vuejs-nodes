@@ -101,7 +101,7 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         if (value.name === "if") {
             let signOperator = value.data.option;
             pythonCode = {
-                condition: `if ${value.data.number1} ${signOperator} ${value.data.number2}:`,
+                condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
                 true: "print(true)",
                 else: "else:",
                 false:"print(false)" 
@@ -109,7 +109,7 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         }
         if (value.name === "for") {
             pythonCode = {
-                condition: `for ${value.data.number1} in ${value.data.number2}:`,
+                condition: `for ${value.data.num1} in ${value.data.num2}:`,
                 result: `print('Hello world!')`,
             }
         }
