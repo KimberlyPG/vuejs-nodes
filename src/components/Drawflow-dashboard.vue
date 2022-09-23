@@ -46,7 +46,7 @@
                         <p className="ml-5">{{store.state.jsToPython.result}}</p>
                         <p className="text-sm mt-4 mb-2">{{store.state.jsToPythonCount.loop}}</p>
                         <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
-                            <div v-for="i in jsToPythonCycle" :key="i.number">
+                            <div v-for="i in store.state.jsToPythonBucle" :key="i.number">
                                 <p>{{ i.number + " "+ i.variable }}</p>
                             </div>
                         </div>
@@ -72,6 +72,7 @@
     import {javascriptToPython} from '../javascriptToPython'
     import {validationIf} from '../validationIf'
     import {validationFor} from '../validationFor'
+    import { operationValues } from '@/operationValues'
 
     export default {
         name: "DrawflowDashboard",
@@ -136,7 +137,6 @@
             },
         ]);
 
-        const jsToPythonCycle = shallowRef('');
         const showNodes = shallowRef('');
         const programOptions = shallowRef('');
         const optionSelected = shallowRef(0);
@@ -360,41 +360,6 @@
             });
         });
 
-        function operationValues(num1, num2, nodeName, node) {
-            let result = 0;
-            let number1 = 0;
-            let number2 = 0;
-            if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length > 0) {
-                number1 = num1
-                number2 = num2
-            }
-            else if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length == 0) {
-                number1 = num1 
-                number2 = 0
-            } 
-            else if(node.inputs.input_1.connections.length == 0 && node.inputs.input_2.connections.length > 0) {
-                number1 = 0
-                number2 = num2
-            }
-            switch (nodeName) {
-                case "addition":
-                    result = number1 + number2;
-                    break;
-                case "subtraction":
-                    result = number1 - number2;
-                    break;
-                case "multiplication":
-                    result = number1 * number2;
-                    break;
-                case "division":
-                    result = number1 / number2;
-                    break;
-                default:
-                    console.log("No name");
-            }
-            return result;
-        }
-
         function EditorData () {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
@@ -501,7 +466,6 @@
             drag,
             drop,
             allowDrop,
-            jsToPythonCycle,
             setData,
             showNodes,
             getData,

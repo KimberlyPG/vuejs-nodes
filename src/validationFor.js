@@ -1,6 +1,6 @@
 import store from "./store/index";
 
-function validationFor(num1, num2) {
+export function validationFor(num1, num2) {
     let result = 0;
     let message = "";
     let jsonArr = [];
@@ -14,6 +14,6 @@ function validationFor(num1, num2) {
 
     }
     message = `Executed: ${result} times`;
-    jsToPythonCycle.value = jsonArr;
+    store.commit('setJsToPythonBucle', jsonArr) 
     return message;
 }
