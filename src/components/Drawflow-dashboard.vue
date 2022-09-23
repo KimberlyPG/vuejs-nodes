@@ -58,10 +58,11 @@
 </template>
 
 <script>
+    import {useStore} from 'vuex'
+    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef} from 'vue'
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css' 
-    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef} from 'vue'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
@@ -69,7 +70,8 @@
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
     import {javascriptToPython} from '../javascriptToPython'
-    import {useStore} from 'vuex'
+    import {validationIf} from '../validationIf'
+    import {validationFor} from '../validationFor'
 
     export default {
         name: "DrawflowDashboard",
@@ -270,7 +272,7 @@
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
                             console.log("num1", nodeData.data.num1, "num2", nodeData.data.num2)
-                            const conditionResult = validateIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
+                            const conditionResult = validationIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
                                 conditionResult: conditionResult
                             };
@@ -279,7 +281,7 @@
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
-                            const conditionResult = validateFor(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2));
+                            const conditionResult = validationFor(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2));
                             const objectOperation = {
                                 conditionResult: conditionResult
                             };
@@ -334,7 +336,7 @@
                 }
                 if (nodeName === "nodeCondition" && conditionName === "if") {
                     const jsonWIthValues = inputData.data;
-                    const conditionResult = validateIf(parseFloat(output.data.num1), parseFloat(output.data.num2), output.data.option);
+                    const conditionResult = validationIf(parseFloat(output.data.num1), parseFloat(output.data.num2), output.data.option);
                     const objectOperation = {
                         ...jsonWIthValues,
                         conditionResult: conditionResult
@@ -345,7 +347,7 @@
                 }
                 if (nodeName === "nodeCondition" && conditionName === "for") {
                     const jsonWIthValues = inputData.data;
-                    const conditionResult = validateFor(parseFloat(output.data.num1), parseFloat(output.data.num2));
+                    const conditionResult = validationFor(parseFloat(output.data.num1), parseFloat(output.data.num2));
                     const objectOperation = {
                         ...jsonWIthValues,
                         conditionResult: conditionResult
@@ -391,73 +393,6 @@
                     console.log("No name");
             }
             return result;
-        }
-
-        function validateIf(num1, num2, nodeName) {
-            let result = 'false';
-            switch (nodeName) {
-                case "<":
-                    if (num1 < num2) {
-                        result = 'true';
-                    }
-                    else {
-                        result = 'false';
-                    }
-                    break;
-                case ">":
-                    if (num1 > num2) {
-                        result = 'true';
-                    }
-                    else {
-                        result = 'false';
-                    }
-                    break;
-                case "<=":
-                    if (num1 <= num2) {
-                        result = 'true';
-                    }
-                    else {
-                        result = 'false';
-                    }
-                    break;
-                case ">=":
-                    if (num1 >= num2) {
-                        result = 'true';
-                    }
-                    else {
-                        result = 'false';
-                    }
-                    break;
-                case "=":
-                    if (num1 == num2) {
-                        result = 'true';
-                    }
-                    else {
-                        result = 'false';
-                    }
-                    break;
-                default:
-                    console.log("No name");
-            }
-            return result;
-        }
-
-        function validateFor(num1, num2) {
-            let result = 0;
-            let message = "";
-            let jsonArr = [];
-            while (num1 < num2) {
-                jsonArr.push({
-                    number: `${result}`,
-                    variable: 'Hello world!'
-                })
-                num1++;
-                result++;
-
-            }
-            message = `Executed: ${result} times`;
-            jsToPythonCycle.value = jsonArr;
-            return message;
         }
 
         function EditorData () {
