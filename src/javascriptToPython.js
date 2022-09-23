@@ -1,39 +1,29 @@
 import store from "./store/index";
 
-export function javascriptToPython(variableName, editor) {
+export function javascriptToPython(variableName, editor, num1, num2) {
     const dataNodes = editor.drawflow.Home.data;
-    console.log("Data", dataNodes)
-    let num1 = 0;
-    let num2 = 0;
     let number1 = 0;
     let number2 = 0;
     let total;
     let assignName = variableName;
     let pythonCode = '';
     let pythonCodePrint = '';
-    let state = false;
+
     
     Object.entries(dataNodes).forEach(([, value]) => {     
-        if (value.name === "number") {
-            if (state == false && value.outputs.output_1.connections.length === 1) {
-                num1 = value.data.number;
-                state = true;
-            }
-            else if (state == true) {
-                num2 = value.data.number;
-                state = false;
-            }
-        }
         if (value.name === "addition") {
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
+                console.log("op1", number2)
                 number1 = num1
                 number2 = num2
             }
             else if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length == 0) {
+                console.log("op2",number2)
                 number1 = num1 
                 number2 = 0
             } 
             else if(value.inputs.input_1.connections.length == 0 && value.inputs.input_2.connections.length > 0) {
+                console.log("op3",number2)
                 number1 = 0
                 number2 = num2
             }  
@@ -111,7 +101,7 @@ export function javascriptToPython(variableName, editor) {
         if (value.name === "if") {
             let signOperator = value.data.option;
             pythonCode = {
-                condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
+                condition: `if ${value.data.number1} ${signOperator} ${value.data.number2}:`,
                 true: "print(true)",
                 else: "else:",
                 false:"print(false)" 
@@ -119,7 +109,7 @@ export function javascriptToPython(variableName, editor) {
         }
         if (value.name === "for") {
             pythonCode = {
-                condition: `for ${value.data.num1} in ${value.data.num2}:`,
+                condition: `for ${value.data.number1} in ${value.data.number2}:`,
                 result: `print('Hello world!')`,
             }
         }
@@ -131,6 +121,5 @@ export function javascriptToPython(variableName, editor) {
 
         store.commit('setJsToPython', pythonCode)
         store.commit('setJsToPythonCount', pythonCodePrint)
-        return pythonCode;
     });
 }

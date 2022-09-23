@@ -7,7 +7,6 @@
 
 <script> 
     // import { getCurrentInstance, onMounted, ref } from 'vue
-
     export default {
         name: 'NodeNumber',
         // data: () => {

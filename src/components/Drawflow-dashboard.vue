@@ -82,6 +82,7 @@
                 item: "number",
                 input: 0,
                 output: 1,
+                number: 0
             },
             {
                 name: "Addition",
@@ -176,23 +177,23 @@
             }
         };
 
+        // drop node into drarflow editor
+        const addNodeToDrawFlow = (name, pos_x, pos_y) => {
+            pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x
+            * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
+            pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
+            * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
+            // adding node to drawflow
+            const nodeSelected = nodesList.find(object => object.item == name);
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {number: 0}, name, "vue");
+        };
+        
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
             console.log(optionSelected.value)
             showSelected();
         }
         
-        // drop node into drarflow editor
-        const addNodeToDrawFlow = (name, pos_x, pos_y) => {
-            pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x
-                * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
-            pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
-                * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
-            // adding node to drawflow
-            const nodeSelected = nodesList.find(object => object.item == name);
-            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {}, name, "vue");
-        };
-
         onMounted(() => {
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
@@ -221,7 +222,7 @@
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         console.log("variableName change", variableName)
-                        javascriptToPython(variableName, editor.value.export());
+                        javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
                 else {
@@ -285,8 +286,8 @@
                             const input_id = inputNodeData.id;
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
-                        console.log("variableName change2", variableName)
-                        javascriptToPython(variableName, editor.value.export());
+
+                        javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
             });
@@ -351,7 +352,7 @@
                     const input_id = editor.value.getNodeFromId(data.input_id).id;
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
-                javascriptToPython(variableName, editor.value.export());
+                javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
         });
 
