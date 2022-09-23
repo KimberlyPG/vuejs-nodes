@@ -35,16 +35,16 @@
                     </div>
 
                     <div className="text-gray-600">
-                        <p>{{jsToPython.num1}}</p>
-                        <p>{{jsToPython.num2}}</p>
-                        <p>{{jsToPython.operation}}</p>
-                        <p>{{jsToPython.variable}}</p>
-                        <p>{{jsToPython.condition}}</p>
-                        <p className="ml-5">{{jsToPython.true}}</p>
-                        <p>{{jsToPython.else}}</p>
-                        <p className="ml-5">{{jsToPython.false}}</p>
-                        <p className="ml-5">{{jsToPython.result}}</p>
-                        <p className="text-sm mt-4 mb-2">{{jsToPythonCount.loop}}</p>
+                        <p>{{store.state.jsToPython.num1}}</p>
+                        <p>{{store.state.jsToPython.num2}}</p>
+                        <p>{{store.state.jsToPython.operation}}</p>
+                        <p>{{store.state.jsToPython.variable}}</p>
+                        <p>{{store.state.jsToPython.condition}}</p>
+                        <p className="ml-5">{{store.state.jsToPython.true}}</p>
+                        <p>{{store.state.jsToPython.else}}</p>
+                        <p className="ml-5">{{store.state.jsToPython.false}}</p>
+                        <p className="ml-5">{{store.state.jsToPython.result}}</p>
+                        <!-- <p className="text-sm mt-4 mb-2">{{jsToPythonCount.loop}}</p> -->
 
                         <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
                             <div v-for="i in jsToPythonCycle" :key="i.number">
@@ -63,18 +63,21 @@
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css'
-    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef } from 'vue'
+    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef} from 'vue'
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    // import {useStore} from 'vuex'
+    // import {javascriptToPython} from '../javascriptToPython'
+    import {useStore} from 'vuex'
 
     export default {
         name: "DrawflowDashboard",
     setup() {   
+        const store = useStore();
+        // const jsToPython = computed(() => store.getters.jsToPythonData)
         const nodesList = readonly([
             {
                 name: "Number",
@@ -132,13 +135,13 @@
             },
         ]);
 
-        const jsToPython = shallowRef('');
+        // const jsToPython = shallowRef('');
         const jsToPythonCycle = shallowRef('');
-        const jsToPythonCount = shallowRef('');
+        // const jsToPythonCount = shallowRef('');
         const showNodes = shallowRef('');
         const programOptions = shallowRef('');
         const optionSelected = shallowRef(0);
-        const jsonImport = shallowRef({});
+        const jsonImport = shallowRef({});   
         
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
@@ -223,6 +226,7 @@
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         javascriptToPython(variableName);
+                        console.log("editor", editor.value.export())
                     }
                 }
                 else {
@@ -446,86 +450,94 @@
         }
 
         function javascriptToPython(variableName) {
-            const exportdata = editor.value.export();
-            const dataNodes = exportdata.drawflow.Home.data;
+        const exportdata = editor.value.export();
+        const dataNodes = exportdata.drawflow.Home.data;
 
-            let num1 = null;
-            let num2 = null;
-            let total;
-            let assignName = variableName;
-            let pythonCode = '';
-            let pythonCodePrint = '';
+        let num1 = null;
+        let num2 = null;
+        let total;
+        let assignName = variableName;
+        let pythonCode = '';
+        let pythonCodePrint = '';
 
-            Object.entries(dataNodes).forEach(([, value]) => {
-                if (value.name === "number") {
-                    if (num1 == null && value.outputs.output_1.connections.length === 1) {
-                        num1 = value.data.number;
-                    }
-                    else if (num1 != null && value.outputs.output_1.connections.length === 1) {
-                        num2 = value.data.number;
-                    }
-                }               
-                if (value.name === "addition") {
-                    total = value.data.result;
-                    pythonCode = {
-                        num1: `num1 = ${num1 == null ? 0 : num1}`,
-                        num2: `num2 = ${num2 == null ? 0 : num2}`,
-                        operation: "# addition = num1 + num2",
-                        variable: `${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`
-                    }
-                }
-                if (value.name === "subtraction") {
-                    total = value.data.result;
-                    pythonCode = {
-                        num1: `num1 = ${num1 == null ? 0 : num1}`,
-                        num2: `num2 = ${num2 == null ? 0 : num2}`,
-                        operation: "# subtraction = num1 - num2",
-                        variable: `${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`
-                    }
-                }
-                if (value.name === "multiplication") {
-                    total = value.data.result;
-                    pythonCode = {
-                        num1: `num1 = ${num1 == null ? 0 : num1}`,
-                        num2: `num2 = ${num2 == null ? 0 : num2}`,
-                        operation: "# multiplication = num1 * num2",
-                        variable: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`
-                    }
-                }
-                if (value.name === "division") {
-                    total = value.data.result;
-                    pythonCode = {
-                        num1: `num1 = ${num1 == null ? 0 : num1}`,
-                        num2: `num2 = ${num2 == null ? 0 : num2}`,
-                        operation: "# division = num1 / num2",
-                        variable: `${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`
-                    }
-                }
-                if (value.name === "if") {
-                    let signOperator = value.data.option;
-                    pythonCode = {
-                        condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
-                        true: "print(true)",
-                        else: "else:",
-                        false:"print(false)" 
-                    }
-                }
-                if (value.name === "for") {
-                    pythonCode = {
-                        condition: `for ${value.data.num1} in ${value.data.num2}:`,
-                        result: `print('Hello world!')`,
-                    }
-                }
-                if(value.name === "nodeCondition") {
-                    pythonCodePrint = {
-                        loop: `${value.data.conditionResult}`
-                    }
-                }
-                jsToPython.value = pythonCode;
-                jsToPythonCount.value = pythonCodePrint;
-                return pythonCode;
-            });
+        Object.entries(dataNodes).forEach(([, value]) => {
+            if (value.name === "number") {
+            if (num1 == null && value.outputs.output_1.connections.length === 1) {
+                num1 = value.data.number;
+            }
+            else if (num1 != null && value.outputs.output_1.connections.length === 1) {
+                num2 = value.data.number;
+            }
         }
+                     
+        if (value.name === "addition") {
+            total = value.data.result;
+            assignName = value.data.variable
+            pythonCode = {
+                num1: `num1 = ${num1 == null ? 0 : num1}`,
+                num2: `num2 = ${num2 == null ? 0 : num2}`,
+                operation: "# addition = num1 + num2",
+                variable: `${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`
+            }
+        }
+        if (value.name === "subtraction") {
+            total = value.data.result;
+            assignName = value.data.variable
+            pythonCode = {
+                num1: `num1 = ${num1 == null ? 0 : num1}`,
+                num2: `num2 = ${num2 == null ? 0 : num2}`,
+                operation: "# subtraction = num1 - num2",
+                variable: `${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`
+            }
+        }
+        if (value.name === "multiplication") {
+            total = value.data.result;
+            assignName = value.data.variable
+            pythonCode = {
+                num1: `num1 = ${num1 == null ? 0 : num1}`,
+                num2: `num2 = ${num2 == null ? 0 : num2}`,
+                operation: "# multiplication = num1 * num2",
+                variable: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`
+            }
+        }
+        if (value.name === "division") {
+            total = value.data.result;
+            assignName = value.data.variable
+            pythonCode = {
+                num1: `num1 = ${num1 == null ? 0 : num1}`,
+                num2: `num2 = ${num2 == null ? 0 : num2}`,
+                operation: "# division = num1 / num2",
+                variable: `${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`
+            }
+        }
+        if (value.name === "if") {
+            let signOperator = value.data.option;
+            pythonCode = {
+                condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
+                true: "print(true)",
+                else: "else:",
+                false:"print(false)" 
+            }
+        }
+        if (value.name === "for") {
+            pythonCode = {
+                condition: `for ${value.data.num1} in ${value.data.num2}:`,
+                result: `print('Hello world!')`,
+            }
+        }
+        if(value.name === "nodeCondition") {
+            pythonCodePrint = {
+                loop: `${value.data.conditionResult}`
+            }
+        }
+        // jsToPython.value = pythonCode;
+        // jsToPythonCount.value = pythonCodePrint;
+        console.log("state", store.state.jsToPython)
+        store.commit('setJsToPython', pythonCode)
+        store.commit('setJsToPythonCount', pythonCodePrint)
+        return pythonCode;
+    });
+}
 
         function EditorData () {
             const exportdata = editor.value.export();
@@ -633,8 +645,6 @@
             drag,
             drop,
             allowDrop,
-            jsToPython,
-            jsToPythonCount,
             jsToPythonCycle,
             setData,
             showNodes,
@@ -642,7 +652,8 @@
             importNodeData,
             programOptions,
             valueSelected,
-            CleanEditor
+            CleanEditor,
+            store
         }
     }
 }
