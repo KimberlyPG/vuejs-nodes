@@ -1,16 +1,16 @@
 <template>
     <div className="h-full mx-2">
-        <button @click="CleanEditor">Clean editor</button>
+        <button @click="cleanEditor()">Clean editor</button>
         <div className="flex justify-end mb-3 text-lg">
             <input placeholder="Add your program name" @input="addProgramName($event)" />
-            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData">
+            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData()">
                 Save
             </button>
-            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" @click="getData" @change="valueSelected($event)">
+            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" @click="getData()" @change="valueSelected($event)">
                     <option value="Select">Choose</option>
-                    <option v-for="j in programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
+                    <option v-for="j in store.state.programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
             </select>
-            <button @click="deleteData">Delete</button>
+            <button @click="deleteData(); cleanEditor(); getData()">Delete</button>
         </div>
         
         <div class="h-3/4 flex flex-row w-full">
@@ -78,18 +78,18 @@
     import {validationFor} from '../utils/validationFor'
     import { operationValues } from '@/utils/operationValues'
     import { nodesList } from '../utils/nodesList'
-    // import { getData } from '../api/getData'
-    // import { setData } from '../api/setData'
+    import { getData } from '../api/getData'
+    import { deleteData } from '../api/deleteData'
 
     export default {
     name: "DrawflowDashboard",
     setup() {
         const store = useStore();
         const showNodes = shallowRef("");
-        const programOptions = shallowRef("");
+        // const programOptions = shallowRef("");
         const optionSelected = shallowRef(0);
-        const jsonImport = shallowRef({});
-        const programId = shallowRef('');
+        // const jsonImport = shallowRef({});
+        // const programId = shallowRef('');
         const programName = shallowRef(); 
 
         const editor = shallowRef({});
@@ -137,11 +137,15 @@
             const nodeSelected = nodesList.find(object => object.item === name);
             editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, { number: 0, num1: 0, num2: 0 }, name, "vue");
         };
+
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            programId.value = programOptions.value[optionSelected.value].name
-            showSelected();
-            
+            store.commit('setProgramId', store.state.programOptions[optionSelected.value].name) 
+            showSelected();   
+        };
+
+        const addProgramName = (event) => {
+        programName.value = event.target.value
         };
 
         onMounted(() => {
@@ -269,10 +273,10 @@
                     }
                     if(editorData[i].name === 'number') {
                         if(editorData[i].outputs.output_1.connections[0].output === 'input_1') {
-                            num1 = editorData[i].data.number;
+                            num1 = parseFloat(editorData[i].data.number);
                         }
                         if(editorData[i].outputs.output_1.connections[0].output === 'input_2') {
-                            num2 = editorData[i].data.number;
+                            num2 = parseFloat(editorData[i].data.number);
                         }
                     }
                 });
@@ -299,7 +303,7 @@
                 })
             });
 
-        function EditorData() {
+        function editorData() {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
 
@@ -307,12 +311,7 @@
             Object.keys(nodes).forEach(function (i) {
                 nodesData.push(nodes[i]);
             });
-            // store.commit('editorData', {nodesData})
             return {programName: programName.value, nodesData};
-        }
-
-        function addProgramName(event) {
-            programName.value = event.target.value
         }
 
         const setData = async () => {
@@ -321,45 +320,13 @@
                 headers: {
                     "Content-type": "application/json",
                 },
-                body: JSON.stringify(EditorData())
+                body: JSON.stringify(editorData())
             })
         };
         
-        const getData = async () => {
-            fetch("http://localhost:5000/getAllPrograms", {
-                method: "GET",
-                headers: {
-                    "Content-type": "application/json",
-                },
-            })
-                .then((response) => response.json())
-                .then((json) => {
-                importNodeData(json);
-                jsonImport.value = json;
-            });
-        };
-
-        const deleteData = async ()=>{
-            fetch(`http://localhost:5000/deleteProgram?id=${programId.value}`, {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-            })
-            CleanEditor()
-        }
-
-        function importNodeData(json) {
-            // const json = store.state.jsonImport
-            const arrayDropdown = [];
-            json.get.forEach((element, index) => {
-                arrayDropdown.push({id: index, name: element.uid, programName: element.programName});
-            });
-            programOptions.value = arrayDropdown;
-        }
         function showSelected() {
-            CleanEditor();
-            const validate = jsonImport.value;
+            cleanEditor();
+            const validate = store.state.jsImport;
             if (!!validate === true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
@@ -411,8 +378,11 @@
             }
         }
 
-        function CleanEditor() {
+        function cleanEditor() {
             editor.value.clear();
+            store.commit('setJsToPython', '');
+            store.commit('setJsToPythonCount', '');
+            store.commit('setJsToPythonBucle', []);
         }
 
         return {
@@ -420,16 +390,15 @@
             drag,
             drop,
             allowDrop,
-            setData,
             showNodes,
             getData,
-            importNodeData,
-            programOptions,
+            setData,
             valueSelected,
-            CleanEditor,
+            cleanEditor,
             deleteData,
             store,
-            addProgramName
+            addProgramName,
+            editorData
         };
     },
     // components: { PythonCode }

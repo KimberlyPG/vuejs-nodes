@@ -9,8 +9,16 @@ export const getData = async () => {
     })
         .then((response) => response.json())
         .then((json) => {
-        // importNodeData(json);
-        // jsonImport.value = json;
-        store.commit('setJsImport', json)
+            store.commit('setJsImport', json)
+            importNodeData(json)
     });
 };
+
+
+function importNodeData(json) {
+    const arrayDropdown = [];
+    json.get.forEach((element, index) => {
+        arrayDropdown.push({id: index, name: element.uid, programName: element.programName});
+    });
+    store.commit('setProgramOptions', arrayDropdown)
+}
