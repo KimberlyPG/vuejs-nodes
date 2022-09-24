@@ -2,15 +2,17 @@ export function operationValues(num1, num2, nodeName, node) {
     let result = 0;
     let number1 = 0;
     let number2 = 0;
-    if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length > 0) {
+    let inputs1 = node.inputs.input_1.connections.length
+    let inputs2 = node.inputs.input_2.connections.length
+    if(inputs1 > 0 && inputs2 > 0) {
         number1 = num1
         number2 = num2
     }
-    else if(node.inputs.input_1.connections.length > 0 && node.inputs.input_2.connections.length == 0) {
+    else if(inputs1 > 0 && inputs2 == 0) {
         number1 = num1 
         number2 = 0
     } 
-    else if(node.inputs.input_1.connections.length == 0 && node.inputs.input_2.connections.length > 0) {
+    else if(inputs1 == 0 && inputs2 > 0) {
         number1 = 0
         number2 = num2
     }

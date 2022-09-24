@@ -4,7 +4,9 @@ const store = createStore({
     state: {
         jsToPython: '',
         jsToPythonCount: '',
-        jsToPythonBucle: []
+        jsToPythonBucle: [],
+        jsImport: {},
+        editorData: {}
     },
     mutations: {
         setJsToPython(state, value)
@@ -18,6 +20,14 @@ const store = createStore({
         setJsToPythonBucle(state, value)
         {
             state.jsToPythonBucle = value
+        },
+        setJsImport(state, value)
+        {
+            state.jsImport = value
+        },
+        setEditorData(state, value)
+        {
+            state.editorData = value
         }
     },
     getters: {

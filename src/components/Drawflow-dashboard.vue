@@ -2,13 +2,15 @@
     <div className="h-full mx-2">
         <button @click="CleanEditor">Clean editor</button>
         <div className="flex justify-end mb-3 text-lg">
+            <input placeholder="Add your program name" @input="addProgramName($event)" />
             <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData">
                 Save
             </button>
             <select className="w-40 bg-blue-400 text-gray-100 rounded-md" @click="getData" @change="valueSelected($event)">
                     <option value="Select">Choose</option>
-                    <option v-for="j in programOptions" :key="j.id" :value="j.id">{{j.name}}</option>
+                    <option v-for="j in programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
             </select>
+            <button @click="deleteData">Delete</button>
         </div>
         
         <div class="h-3/4 flex flex-row w-full">
@@ -75,6 +77,8 @@
     import {validationIf} from '../utils/validationIf'
     import {validationFor} from '../utils/validationFor'
     import { operationValues } from '@/utils/operationValues'
+    // import { getData } from '../api/getData'
+    // import { setData } from '../api/setData'
 
     export default {
     name: "DrawflowDashboard",
@@ -142,6 +146,9 @@
         const programOptions = shallowRef("");
         const optionSelected = shallowRef(0);
         const jsonImport = shallowRef({});
+        const programId = shallowRef('');
+        const programName = shallowRef(); 
+
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
@@ -188,8 +195,9 @@
         };
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            console.log(optionSelected.value);
+            programId.value = programOptions.value[optionSelected.value].name
             showSelected();
+            
         };
         onMounted(() => {
             const id = document.getElementById("drawflow");
@@ -208,7 +216,7 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
-            editor.value.registerNode("importedNodes", showNodes, {}, {});
+            // editor.value.registerNode("importedNodes", showNodes, {}, {});
 
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
@@ -350,8 +358,24 @@
             Object.keys(nodes).forEach(function (i) {
                 nodesData.push(nodes[i]);
             });
-            return { nodesData };
+            // store.commit('editorData', {nodesData})
+            return {programName: programName.value, nodesData};
         }
+
+        function addProgramName(event) {
+            programName.value = event.target.value
+        }
+
+        const setData = async () => {
+            fetch("http://localhost:5000/setAllPrograms", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify(EditorData())
+            }).then(console.log(EditorData()));
+        };
+        
         const getData = async () => {
             fetch("http://localhost:5000/getAllPrograms", {
                 method: "GET",
@@ -363,16 +387,30 @@
                 .then((json) => {
                 importNodeData(json);
                 jsonImport.value = json;
+                console.log("json", json)
             });
         };
+
+        const deleteData = async()=>{
+            fetch(`http://localhost:5000/deleteProgram?id=${programId.value}`, {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+            })
+            CleanEditor()
+        }
+
         function importNodeData(json) {
+            // const json = store.state.jsonImport
             const arrayDropdown = [];
             json.get.forEach((element, index) => {
-                arrayDropdown.push({ id: index, name: element.uid });
+                arrayDropdown.push({id: index, name: element.uid, programName: element.programName});
             });
             programOptions.value = arrayDropdown;
         }
         function showSelected() {
+            CleanEditor();
             const validate = jsonImport.value;
             if (!!validate == true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
@@ -404,10 +442,13 @@
                     }
                     arrayOfNodesNew.push(newData);
                 });
-                let newObject = {};
-                for (var i = 1; i < arrayOfNodesNew.length + 1; i++) {
-                    newObject[i] = arrayOfNodesNew[i - 1];
-                }
+                
+                let newObject = {}
+                arrayOfNodesNew.forEach((element, index) => {
+                    let id = arrayOfNodesNew[index].id
+                    newObject[id] = arrayOfNodesNew[index]
+                })
+
                 let data = newObject;
                 const ob = { drawflow: {
                         Home: {
@@ -415,22 +456,17 @@
                         }
                     }
                 };
+
                 showNodes.value = ob;
-                editor.value.import(showNodes.value);
+                editor.value.reroute = true;
+                editor.value.import(showNodes.value); 
             }
         }
-        const setData = async () => {
-            fetch("http://localhost:5000/setAllPrograms", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json",
-                },
-                body: JSON.stringify(EditorData())
-            }).then(console.log(EditorData()));
-        };
+
         function CleanEditor() {
             editor.value.clear();
         }
+
         return {
             nodesList,
             drag,
@@ -443,7 +479,9 @@
             programOptions,
             valueSelected,
             CleanEditor,
-            store
+            deleteData,
+            store,
+            addProgramName
         };
     },
     // components: { PythonCode }
@@ -464,9 +502,9 @@
     }
 
     #drawflow {
+      text-align:initial;
       width: 100%;
-      height: 100%;
-      text-align: initial;
+      height: 98vw;
       background: #f1eeee;
       background-size: 20px 20px;
       background-image: radial-gradient(#b6b4b4 1px, transparent 1px);      
