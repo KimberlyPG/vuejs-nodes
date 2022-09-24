@@ -243,7 +243,6 @@
                                 num2 = outputNumber;
                             }
                             let result = operationValues(num1, num2, inputNodeName, inputNodeData);
-                            console.log("result", result)
                             const objectOperation = {
                                 result: result
                             };
@@ -371,9 +370,6 @@
                 let result = '';
 
                 Object.keys(editorData).forEach(function (i) {
-                    if(editorData[i].name === 'assign') {
-                        variableName = editorData[i].data.variable;
-                    }
                     if(editorData[i].name === 'addition' || editorData[i].name === 'subtraction' || editorData[i].name === 'division' || editorData[i].name === 'multiplication') {
                         result = operationValues(num1, num2, editorData[i].name, editorData[i]);
                         const objectOperation = {
@@ -383,8 +379,13 @@
                         const input_id = editorData[i].id;
                         operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }   
-                    })                               
-                    javascriptToPython(variableName, editor.value.export(), num1, num2);
+                        if(editorData[i].name === 'assign') {
+                            variableName = editorData[i].data.variable;
+                            editor.value.updateNodeDataFromId(editorData[i].id, {...editorData[i].data, assign: result});
+                        }
+                        javascriptToPython(variableName, editor.value.export(), num1, num2);
+                    })  
+                    console.log(editor.value.export().drawflow.Home.data)                             
                 })
             });
 
@@ -428,7 +429,7 @@
             });
         };
 
-        const deleteData = async()=>{
+        const deleteData = async ()=>{
             fetch(`http://localhost:5000/deleteProgram?id=${programId.value}`, {
                 method: 'POST',
                 headers: {
