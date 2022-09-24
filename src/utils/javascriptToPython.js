@@ -1,4 +1,4 @@
-import store from "./store/index";
+import store from "../store/index";
 
 export function javascriptToPython(variableName, editor, num1, num2) {
     const dataNodes = editor.drawflow.Home.data;

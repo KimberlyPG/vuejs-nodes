@@ -1,4 +1,4 @@
-import store from "./store/index";
+import store from "../store/index";
 
 export function validationFor(num1, num2) {
     let result = 0;

@@ -21,13 +21,14 @@
             <div class="h-[700px] w-full mx-2">
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
             </div>
+
             <div className="bg-white text-black w-1/4 flex">
                 <div className="w-full">
                     <div className="flex">
                         <img 
-                        className="w-10"
-                        src='../assets/python.jpg' 
-                        alt=""
+                            className="w-10"
+                            src='../assets/python.jpg' 
+                            alt=""
                         >
                         <h3 className="text-gray-700">
                             Python code
@@ -35,18 +36,18 @@
                     </div>
 
                     <div className="text-gray-600">
-                        <p>{{store.state.jsToPython.num1}}</p>
-                        <p>{{store.state.jsToPython.num2}}</p>
-                        <p>{{store.state.jsToPython.operation}}</p>
-                        <p>{{store.state.jsToPython.variable}}</p>
-                        <p>{{store.state.jsToPython.condition}}</p>
-                        <p className="ml-5">{{store.state.jsToPython.true}}</p>
-                        <p>{{store.state.jsToPython.else}}</p>
-                        <p className="ml-5">{{store.state.jsToPython.false}}</p>
-                        <p className="ml-5">{{store.state.jsToPython.result}}</p>
-                        <p className="text-sm mt-4 mb-2">{{store.state.jsToPythonCount.loop}}</p>
+                        <p>{{this.store.state.jsToPython.num1}}</p>
+                        <p>{{this.store.state.jsToPython.num2}}</p>
+                        <p>{{this.store.state.jsToPython.operation}}</p>
+                        <p>{{this.store.state.jsToPython.variable}}</p>
+                        <p>{{this.store.state.jsToPython.condition}}</p>
+                        <p className="ml-5">{{this.store.state.jsToPython.true}}</p>
+                        <p>{{this.store.state.jsToPython.else}}</p>
+                        <p className="ml-5">{{this.store.state.jsToPython.false}}</p>
+                        <p className="ml-5">{{this.store.state.jsToPython.result}}</p>
+                        <p className="text-sm mt-4 mb-2">{{this.store.state.jsToPythonCount.loop}}</p>
                         <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
-                            <div v-for="i in store.state.jsToPythonBucle" :key="i.number">
+                            <div v-for="i in this.store.state.jsToPythonBucle" :key="i.number">
                                 <p>{{ i.number + " "+ i.variable }}</p>
                             </div>
                         </div>
@@ -69,14 +70,15 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    import {javascriptToPython} from '../javascriptToPython'
-    import {validationIf} from '../validationIf'
-    import {validationFor} from '../validationFor'
-    import { operationValues } from '@/operationValues'
+    // import PythonCode from './Python-code.vue'
+    import {javascriptToPython} from '../utils/javascriptToPython'
+    import {validationIf} from '../utils/validationIf'
+    import {validationFor} from '../utils/validationFor'
+    import { operationValues } from '@/utils/operationValues'
 
     export default {
-        name: "DrawflowDashboard",
-    setup() {   
+    name: "DrawflowDashboard",
+    setup() {
         const store = useStore();
         // const jsToPython = computed(() => store.getters.jsToPythonData)
         const nodesList = readonly([
@@ -136,18 +138,14 @@
                 output: 0
             },
         ]);
-
-        const showNodes = shallowRef('');
-        const programOptions = shallowRef('');
+        const showNodes = shallowRef("");
+        const programOptions = shallowRef("");
         const optionSelected = shallowRef(0);
-        const jsonImport = shallowRef({});   
-        
+        const jsonImport = shallowRef({});
         const editor = shallowRef({});
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
-
-
         let node_move_select = "";
         let node_last_move = null;
         // node taken
@@ -178,24 +176,21 @@
                 addNodeToDrawFlow(data, ev.clientX, ev.clientY); //node name, x pos, y pos
             }
         };
-
         // drop node into drarflow editor
         const addNodeToDrawFlow = (name, pos_x, pos_y) => {
             pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x
-            * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
+                * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
-            * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
+                * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
             // adding node to drawflow
             const nodeSelected = nodesList.find(object => object.item == name);
-            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, {number: 0, num1: 0, num2: 0}, name, "vue");
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, { number: 0, num1: 0, num2: 0 }, name, "vue");
         };
-        
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            console.log(optionSelected.value)
+            console.log(optionSelected.value);
             showSelected();
-        }
-        
+        };
         onMounted(() => {
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
@@ -213,17 +208,14 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
-            editor.value.registerNode("importedNodes", showNodes, {}, {})
+            editor.value.registerNode("importedNodes", showNodes, {}, {});
 
             editor.value.on("nodeDataChanged", (data) => {
-
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
-
                 if (nodeData.name == "assign") {
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
-                        console.log("variableName change", variableName)
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
@@ -236,12 +228,9 @@
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
                         const outputTotal = parseFloat(inputNodeData.data.result);
-
                         if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
                             total = outputTotal;
                             const nodeOperation = editor.value.getNodeFromId(outputNode[0].node);
-                            
-                            
                             const nodeOperationConnections = nodeOperation.outputs.output_1.connections;
                             if (nodeOperationConnections.length > 0) {
                                 const operationValue = editor.value;
@@ -251,7 +240,6 @@
                                     ...nodeAssignData,
                                     assign: total
                                 };
-
                                 operationValue.updateNodeDataFromId(node_id, objectOperation);
                             }
                         }
@@ -271,7 +259,6 @@
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
-                            console.log("num1", nodeData.data.num1, "num2", nodeData.data.num2)
                             const conditionResult = validationIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
                                 conditionResult: conditionResult
@@ -289,12 +276,10 @@
                             const input_id = inputNodeData.id;
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
                         }
-
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
             });
-
             editor.value.on("connectionCreated", (data) => {
                 const output = editor.value.getNodeFromId(data.output_id);
                 const outputNumber = parseFloat(output.data.number);
@@ -305,7 +290,6 @@
                 const conditionName = output.name;
                 let variableName = "";
 
-                console.log(nodeName)
                 if (nodeName !== "assign" && nodeName !== "nodeCondition") {
                     if (nodeDataOuput == "input_1") {
                         num1 = outputNumber;
@@ -322,12 +306,11 @@
                     operationValue.updateNodeDataFromId(input_id, objectOperation);
                 }
                 else {
-                    variableName = inputData.data.variable;                      
+                    variableName = inputData.data.variable;
                     total = outputTotal;
                     const jsonWIthValues = inputData.data;
-
                     const objectOperation = {
-                        ...jsonWIthValues, 
+                        ...jsonWIthValues,
                         assign: total
                     };
                     const operationValue = editor.value;
@@ -359,108 +342,95 @@
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
         });
-
-        function EditorData () {
+        function EditorData() {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
 
-            console.log('Editor data: ', exportdata);
-           
-            let nodesData = []
-            Object.keys(nodes).forEach(function(i){
+            let nodesData = [];
+            Object.keys(nodes).forEach(function (i) {
                 nodesData.push(nodes[i]);
             });
-            return {nodesData};
+            return { nodesData };
         }
-
-        const getData = async()=>{
-            fetch('http://localhost:5000/getAllPrograms', {
-                method: 'GET',
+        const getData = async () => {
+            fetch("http://localhost:5000/getAllPrograms", {
+                method: "GET",
                 headers: {
-                    'Content-type': 'application/json',
+                    "Content-type": "application/json",
                 },
             })
-            .then((response) => response.json())
-            .then((json) => {
+                .then((response) => response.json())
+                .then((json) => {
                 importNodeData(json);
                 jsonImport.value = json;
-            })
-        }
-                    
-        function importNodeData(json){
+            });
+        };
+        function importNodeData(json) {
             const arrayDropdown = [];
-
             json.get.forEach((element, index) => {
-                arrayDropdown.push({id: index, name: element.uid});
-            })
-
-            programOptions.value = arrayDropdown
+                arrayDropdown.push({ id: index, name: element.uid });
+            });
+            programOptions.value = arrayDropdown;
         }
-
         function showSelected() {
-            const validate = jsonImport.value
-            if(!!validate == true){
+            const validate = jsonImport.value;
+            if (!!validate == true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
                 jsonOption.forEach((value) => {
-                let newData;
-                if(!!value.inputs === false) {
-                    newData = {
-                        ...value,
-                        inputs: {}
+                    let newData;
+                    if (!!value.inputs === false) {
+                        newData = {
+                            ...value,
+                            inputs: {}
+                        };
                     }
-                } else if (!!value.outputs === false) {
-                    newData = {
-                        ...value,
-                        outputs: {}
+                    else if (!!value.outputs === false) {
+                        newData = {
+                            ...value,
+                            outputs: {}
+                        };
                     }
-                } else if (!!value.data === false) {
-                    newData = {
-                        ...value,
-                        data: {}
+                    else if (!!value.data === false) {
+                        newData = {
+                            ...value,
+                            data: {}
+                        };
                     }
-                } else {
-                    newData = {
-                        ...value
+                    else {
+                        newData = {
+                            ...value
+                        };
                     }
-                }
                     arrayOfNodesNew.push(newData);
-                })
-            
-                let newObject = {}
-                for( var i=1; i < arrayOfNodesNew.length+1; i++) {
-                    newObject[i] = arrayOfNodesNew[i-1]
+                });
+                let newObject = {};
+                for (var i = 1; i < arrayOfNodesNew.length + 1; i++) {
+                    newObject[i] = arrayOfNodesNew[i - 1];
                 }
-                
-                let data = newObject
-
-                const ob = {drawflow: {
+                let data = newObject;
+                const ob = { drawflow: {
                         Home: {
                             data
                         }
                     }
-                }
-
+                };
                 showNodes.value = ob;
                 editor.value.import(showNodes.value);
             }
         }
-
-        const  setData = async()=>{
-            fetch('http://localhost:5000/setAllPrograms', {
+        const setData = async () => {
+            fetch("http://localhost:5000/setAllPrograms", {
                 method: "POST",
                 headers: {
-                    'Content-type': 'application/json',
+                    "Content-type": "application/json",
                 },
-                body: 
-                    JSON.stringify(EditorData())         
-            }).then(console.log(EditorData()))
-        }
-
+                body: JSON.stringify(EditorData())
+            }).then(console.log(EditorData()));
+        };
         function CleanEditor() {
-            editor.value.clear()
+            editor.value.clear();
         }
-
         return {
             nodesList,
             drag,
@@ -474,8 +444,9 @@
             valueSelected,
             CleanEditor,
             store
-        }
-    }
+        };
+    },
+    // components: { PythonCode }
 }
 </script>
 
