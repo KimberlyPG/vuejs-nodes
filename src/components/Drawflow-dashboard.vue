@@ -62,7 +62,7 @@
 
 <script>
     import {useStore} from 'vuex'
-    import { h, getCurrentInstance, render, readonly, onMounted, shallowRef} from 'vue'
+    import { h, getCurrentInstance, render, onMounted, shallowRef} from 'vue'
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css' 
@@ -77,6 +77,7 @@
     import {validationIf} from '../utils/validationIf'
     import {validationFor} from '../utils/validationFor'
     import { operationValues } from '@/utils/operationValues'
+    import { nodesList } from '../utils/nodesList'
     // import { getData } from '../api/getData'
     // import { setData } from '../api/setData'
 
@@ -85,63 +86,63 @@
     setup() {
         const store = useStore();
         // const jsToPython = computed(() => store.getters.jsToPythonData)
-        const nodesList = readonly([
-            {
-                name: "Number",
-                item: "number",
-                input: 0,
-                output: 1,
-                number: 0
-            },
-            {
-                name: "Addition",
-                item: "addition",
-                input: 2,
-                output: 1,
-            },
-            {
-                name: "Subtraction",
-                item: "subtraction",
-                input: 2,
-                output: 1,
-            },
-            {
-                name: "Multiplication",
-                item: "multiplication",
-                input: 2,
-                output: 1,
-            },
-            {
-                name: "Division",
-                item: "division",
-                input: 2,
-                output: 1,
-            },
-            {
-                name: "Assign",
-                item: "assign",
-                input: 1,
-                output: 0
-            },
-            {
-                name: "If-else",
-                item: "if",
-                input: 0,
-                output: 1
-            },
-            {
-                name: "For",
-                item: "for",
-                input: 0,
-                output: 1
-            },
-            {
-                name: "Condition result",
-                item: "nodeCondition",
-                input: 1,
-                output: 0
-            },
-        ]);
+        // const nodesList = readonly([
+        //     {
+        //         name: "Number",
+        //         item: "number",
+        //         input: 0,
+        //         output: 1,
+        //         number: 0
+        //     },
+        //     {
+        //         name: "Addition",
+        //         item: "addition",
+        //         input: 2,
+        //         output: 1,
+        //     },
+        //     {
+        //         name: "Subtraction",
+        //         item: "subtraction",
+        //         input: 2,
+        //         output: 1,
+        //     },
+        //     {
+        //         name: "Multiplication",
+        //         item: "multiplication",
+        //         input: 2,
+        //         output: 1,
+        //     },
+        //     {
+        //         name: "Division",
+        //         item: "division",
+        //         input: 2,
+        //         output: 1,
+        //     },
+        //     {
+        //         name: "Assign",
+        //         item: "assign",
+        //         input: 1,
+        //         output: 0
+        //     },
+        //     {
+        //         name: "If-else",
+        //         item: "if",
+        //         input: 0,
+        //         output: 1
+        //     },
+        //     {
+        //         name: "For",
+        //         item: "for",
+        //         input: 0,
+        //         output: 1
+        //     },
+        //     {
+        //         name: "Condition result",
+        //         item: "nodeCondition",
+        //         input: 1,
+        //         output: 0
+        //     },
+        // ]);
         const showNodes = shallowRef("");
         const programOptions = shallowRef("");
         const optionSelected = shallowRef(0);
@@ -190,7 +191,7 @@
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
                 * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
             // adding node to drawflow
-            const nodeSelected = nodesList.find(object => object.item == name);
+            const nodeSelected = nodesList.find(object => object.item === name);
             editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, { number: 0, num1: 0, num2: 0 }, name, "vue");
         };
         const valueSelected = (event) => {
@@ -220,7 +221,7 @@
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
-                if (nodeData.name == "assign") {
+                if (nodeData.name === "assign") {
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
@@ -239,7 +240,7 @@
                             if (nodeDataOuput == "input_1") {
                                 num1 = outputNumber;
                             }
-                            else if (nodeDataOuput == "input_2") {
+                            else if (nodeDataOuput === "input_2") {
                                 num2 = outputNumber;
                             }
                             let result = operationValues(num1, num2, inputNodeName, inputNodeData);
@@ -293,10 +294,10 @@
                 let variableName = "";
 
                 if (nodeName !== "assign" && nodeName !== "nodeCondition") {
-                    if (nodeDataOuput == "input_1") {
+                    if (nodeDataOuput === "input_1") {
                         num1 = outputNumber;
                     }
-                    else if (nodeDataOuput == "input_2") {
+                    else if (nodeDataOuput === "input_2") {
                         num2 = outputNumber;
                     }
                     let result = operationValues(num1, num2, nodeName, inputData);
@@ -450,7 +451,7 @@
         function showSelected() {
             CleanEditor();
             const validate = jsonImport.value;
-            if (!!validate == true) {
+            if (!!validate === true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
                 jsonOption.forEach((value) => {
