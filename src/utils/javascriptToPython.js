@@ -13,19 +13,16 @@ export function javascriptToPython(variableName, editor, num1, num2) {
     Object.entries(dataNodes).forEach(([, value]) => {     
         if (value.name === "addition") {
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
-                console.log("op1", number2)
-                number1 = num1
-                number2 = num2
+                number1 = num1;
+                number2 = num2;
             }
             else if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length == 0) {
-                console.log("op2",number2)
-                number1 = num1 
-                number2 = 0
+                number1 = num1;
+                number2 = 0;
             } 
             else if(value.inputs.input_1.connections.length == 0 && value.inputs.input_2.connections.length > 0) {
-                console.log("op3",number2)
-                number1 = 0
-                number2 = num2
+                number1 = 0;
+                number2 = num2;
             }  
             total = value.data.result;
             pythonCode = {
@@ -38,16 +35,16 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         if (value.name === "subtraction") {
             total = value.data.result;
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = num1
-                number2 = num2
+                number1 = num1;
+                number2 = num2;
             }
             else if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length == 0) {
-                number1 = num1 
-                number2 = 0
+                number1 = num1;
+                number2 = 0;
             } 
             else if(value.inputs.input_1.connections.length == 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = 0
-                number2 = num2
+                number1 = 0;
+                number2 = num2;
             } 
             pythonCode = {
                 num1: `num1 = ${number1}`,
@@ -59,16 +56,16 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         if (value.name === "multiplication") {
             total = value.data.result;
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = num1
-                number2 = num2
+                number1 = num1;
+                number2 = num2;
             }
             else if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length == 0) {
-                number1 = num1 
-                number2 = 0
+                number1 = num1; 
+                number2 = 0;
             } 
             else if(value.inputs.input_1.connections.length == 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = 0
-                number2 = num2
+                number1 = 0;
+                number2 = num2;
             } 
             pythonCode = {
                 num1: `num1 = ${number1}`,
@@ -80,16 +77,16 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         if (value.name === "division") {
             total = value.data.result;
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = num1
-                number2 = num2
+                number1 = num1;
+                number2 = num2;
             }
             else if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length == 0) {
-                number1 = num1 
-                number2 = 0
+                number1 = num1; 
+                number2 = 0;
             } 
             else if(value.inputs.input_1.connections.length == 0 && value.inputs.input_2.connections.length > 0) {
-                number1 = 0
-                number2 = num2
+                number1 = 0;
+                number2 = num2;
             } 
             pythonCode = {
                 num1: `num1 = ${number1}`,
@@ -119,7 +116,7 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             }
         }
 
-        store.commit('setJsToPython', pythonCode)
-        store.commit('setJsToPythonCount', pythonCodePrint)
+        store.commit('setJsToPython', pythonCode);
+        store.commit('setJsToPythonCount', pythonCodePrint);
     });
 }

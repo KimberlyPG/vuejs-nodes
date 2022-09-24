@@ -216,7 +216,6 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
-            // editor.value.registerNode("importedNodes", showNodes, {}, {});
 
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
@@ -235,22 +234,7 @@
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
-                        const outputTotal = parseFloat(inputNodeData.data.result);
-                        if (inputNodeName === "subtraction" || inputNodeName === "addition" || inputNodeName === "multiplication" || inputNodeName === "division") {
-                            total = outputTotal;
-                            const nodeOperation = editor.value.getNodeFromId(outputNode[0].node);
-                            const nodeOperationConnections = nodeOperation.outputs.output_1.connections;
-                            if (nodeOperationConnections.length > 0) {
-                                const operationValue = editor.value;
-                                const node_id = nodeOperation.outputs.output_1.connections[0].node;
-                                const nodeAssignData = editor.value.getNodeFromId(node_id).data;
-                                const objectOperation = {
-                                    ...nodeAssignData,
-                                    assign: total
-                                };
-                                operationValue.updateNodeDataFromId(node_id, objectOperation);
-                            }
-                        }
+
                         if (inputNodeName !== "assign" && inputNodeName !== "nodeCondition") {
                             if (nodeDataOuput == "input_1") {
                                 num1 = outputNumber;
@@ -259,14 +243,25 @@
                                 num2 = outputNumber;
                             }
                             let result = operationValues(num1, num2, inputNodeName, inputNodeData);
+                            console.log("result", result)
                             const objectOperation = {
                                 result: result
                             };
                             const operationValue = editor.value;
                             const input_id = inputNodeData.id;
                             operationValue.updateNodeDataFromId(input_id, objectOperation);
+
+                            if(inputNodeData.outputs.output_1.connections.length > 0) {
+                                const nodeAssignId = inputNodeData.outputs.output_1.connections[0].node;
+                                const nodeAssignData = editor.value.getNodeFromId(nodeAssignId);
+                                const objectOperation = {
+                                    ...nodeAssignData,
+                                    assign: result
+                                };
+                                operationValue.updateNodeDataFromId(nodeAssignId, objectOperation);
+                            }
                         }
-                        if (inputNodeName === "nodeCondition" && nodeData.name == "if") {
+                        if (inputNodeName === "nodeCondition" && nodeData.name === "if") {
                             const conditionResult = validationIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const objectOperation = {
                                 conditionResult: conditionResult
@@ -349,7 +344,50 @@
                 }
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
-        });
+
+            editor.value.on('import', () => {
+                const editorData = editor.value.export().drawflow.Home.data; 
+                let variableName = '';
+
+                Object.keys(editorData).forEach(function (i) {
+                    if(editorData[i].name === 'assign') {
+                        variableName = editorData[i].data.variable;
+                    }
+                    if(editorData[i].name === 'number') {
+                        if(editorData[i].outputs.output_1.connections[0].output === 'input_1') {
+                            num1 = editorData[i].data.number;
+                        }
+                        if(editorData[i].outputs.output_1.connections[0].output === 'input_2') {
+                            num2 = editorData[i].data.number;
+                        }
+                    }
+                });
+                javascriptToPython(variableName, editor.value.export(), num1, num2);  
+                console.log(editor.value.export())
+            });
+            editor.value.on('nodeRemoved', () => {
+                const editorData = editor.value.export().drawflow.Home.data; 
+                let variableName = '';
+                let result = '';
+
+                Object.keys(editorData).forEach(function (i) {
+                    if(editorData[i].name === 'assign') {
+                        variableName = editorData[i].data.variable;
+                    }
+                    if(editorData[i].name === 'addition' || editorData[i].name === 'subtraction' || editorData[i].name === 'division' || editorData[i].name === 'multiplication') {
+                        result = operationValues(num1, num2, editorData[i].name, editorData[i]);
+                        const objectOperation = {
+                            result: result
+                        };
+                        const operationValue = editor.value;
+                        const input_id = editorData[i].id;
+                        operationValue.updateNodeDataFromId(input_id, objectOperation);
+                        }   
+                    })                               
+                    javascriptToPython(variableName, editor.value.export(), num1, num2);
+                })
+            });
+
         function EditorData() {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
@@ -373,7 +411,7 @@
                     "Content-type": "application/json",
                 },
                 body: JSON.stringify(EditorData())
-            }).then(console.log(EditorData()));
+            })
         };
         
         const getData = async () => {
@@ -387,7 +425,6 @@
                 .then((json) => {
                 importNodeData(json);
                 jsonImport.value = json;
-                console.log("json", json)
             });
         };
 
