@@ -1,16 +1,15 @@
 <template>
-    <div className="h-full mx-2">
-        <button @click="cleanEditor()">Clean editor</button>
-        <div className="flex justify-end mb-3 text-lg">
-            <input placeholder="Add your program name" @input="addProgramName($event)" />
-            <button className="w-40 bg-green-500 text-gray-100 mr-3 rounded-md" @click="setData()">
+    <div className="h-full w-full mx-2">
+        <div className="flex justify-end mb-3 text-lg text-gray-100">
+            <input className="text-sm mr-2 rounded-sm" placeholder="Add program name" @input="addProgramName($event)" />
+            <button className="w-32 bg-green-500 mr-3 rounded-md" @click="setData()">
                 Save
             </button>
-            <select className="w-40 bg-blue-400 text-gray-100 rounded-md" @click="getData()" @change="valueSelected($event)">
-                    <option value="Select">Choose</option>
+            <select className="w-32 bg-blue-400 mr-3 rounded-md" @click="getData()" @change="valueSelected($event)">
+                    <option value="Select" className="text-center">Choose</option>
                     <option v-for="j in store.state.programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
             </select>
-            <button @click="deleteData(); cleanEditor(); getData()">Delete</button>
+            <button className="w-32 bg-red-400 mr-3 rounded-md" @click="deleteData(); cleanEditor(); getData()">Delete</button>
         </div>
         
         <div class="h-3/4 flex flex-row w-full">
@@ -19,43 +18,11 @@
                     <span class="node">{{ i.name }}</span>
                 </div>
             </div>
-
-            <div class="h-[700px] w-full mx-2">
+            <div class="h-[700px] w-full mx-2 relative">
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
+                <button className="absolute w-20 bg-blue-400 m-2 rounded-md text-white text-sm right-0 top-0" @click="cleanEditor()">Clear</button>
             </div>
-
-            <div className="bg-white text-black w-1/4 flex">
-                <div className="w-full">
-                    <div className="flex">
-                        <img 
-                            className="w-10"
-                            src='../assets/python.jpg' 
-                            alt=""
-                        >
-                        <h3 className="text-gray-700">
-                            Python code
-                        </h3>
-                    </div>
-
-                    <div className="text-gray-600">
-                        <p>{{this.store.state.jsToPython.num1}}</p>
-                        <p>{{this.store.state.jsToPython.num2}}</p>
-                        <p>{{this.store.state.jsToPython.operation}}</p>
-                        <p>{{this.store.state.jsToPython.variable}}</p>
-                        <p>{{this.store.state.jsToPython.condition}}</p>
-                        <p className="ml-5">{{this.store.state.jsToPython.true}}</p>
-                        <p>{{this.store.state.jsToPython.else}}</p>
-                        <p className="ml-5">{{this.store.state.jsToPython.false}}</p>
-                        <p className="ml-5">{{this.store.state.jsToPython.result}}</p>
-                        <p className="text-sm mt-4 mb-2">{{this.store.state.jsToPythonCount.loop}}</p>
-                        <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
-                            <div v-for="i in this.store.state.jsToPythonBucle" :key="i.number">
-                                <p>{{ i.number + " "+ i.variable }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PythonCode />
         </div>
     </div>    
 </template>
@@ -72,7 +39,7 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    // import PythonCode from './Python-code.vue'
+    import PythonCode from './Python-code.vue'
     import {javascriptToPython} from '../utils/javascriptToPython'
     import {validationIf} from '../utils/validationIf'
     import {validationFor} from '../utils/validationFor'
@@ -86,13 +53,10 @@
     setup() {
         const store = useStore();
         const showNodes = shallowRef("");
-        // const programOptions = shallowRef("");
         const optionSelected = shallowRef(0);
-        // const jsonImport = shallowRef({});
-        // const programId = shallowRef('');
-        const programName = shallowRef(); 
-
+        const programName = shallowRef();
         const editor = shallowRef({});
+
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
@@ -133,19 +97,18 @@
                 * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y
                 * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
-
             const nodeSelected = nodesList.find(object => object.item === name);
             editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, { number: 0, num1: 0, num2: 0 }, name, "vue");
         };
 
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            store.commit('setProgramId', store.state.programOptions[optionSelected.value].name) 
-            showSelected();   
+            store.commit("setProgramId", store.state.programOptions[optionSelected.value].name);
+            showSelected();
         };
 
         const addProgramName = (event) => {
-        programName.value = event.target.value
+            programName.value = event.target.value;
         };
 
         onMounted(() => {
@@ -153,7 +116,6 @@
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
             let num1 = 0, num2 = 0, total = 0;
-
             editor.value.registerNode("number", <NodeNumber />, {}, {});
             editor.value.registerNode("addition", <NodeOperation title="Addition"/>, {}, {});
             editor.value.registerNode("subtraction", <NodeOperation title="Subtraction"/>, {}, {});
@@ -163,11 +125,9 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
-
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
-
                 if (nodeData.name === "assign") {
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
@@ -182,7 +142,6 @@
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
-
                         if (inputNodeName !== "assign" && inputNodeName !== "nodeCondition") {
                             if (output_class == "input_1") {
                                 num1 = outputNumber;
@@ -192,33 +151,29 @@
                             }
                             const result = operationValues(num1, num2, inputNodeName, inputNodeData);
                             const input_id = inputNodeData.id;
-
-                            editor.value.updateNodeDataFromId(input_id, {result: result});
-
-                            if(inputNodeData.outputs.output_1.connections.length > 0) {
+                            editor.value.updateNodeDataFromId(input_id, { result: result });
+                            if (inputNodeData.outputs.output_1.connections.length > 0) {
                                 const nodeAssignId = inputNodeData.outputs.output_1.connections[0].node;
                                 const nodeAssignData = editor.value.getNodeFromId(nodeAssignId);
-
-                                editor.value.updateNodeDataFromId(nodeAssignId, {...nodeAssignData, assign: result});
+                                editor.value.updateNodeDataFromId(nodeAssignId, { ...nodeAssignData, assign: result });
                             }
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name === "if") {
                             const conditionResult = validationIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
                             const input_id = inputNodeData.id;
-                            editor.value.updateNodeDataFromId(input_id, {conditionResult});
+                            editor.value.updateNodeDataFromId(input_id, { conditionResult });
                         }
                         if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
                             const conditionResult = validationFor(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2));
                             const input_id = inputNodeData.id;
-                            editor.value.updateNodeDataFromId(input_id, {conditionResult});
+                            editor.value.updateNodeDataFromId(input_id, { conditionResult });
                         }
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
             });
-
             editor.value.on("connectionCreated", (data) => {
-                console.log(data)
+                console.log(data);
                 const outputData = editor.value.getNodeFromId(data.output_id);
                 const outputNumber = parseFloat(outputData.data.number);
                 const outputTotal = parseFloat(outputData.data.result);
@@ -227,7 +182,6 @@
                 const inputName = inputData.name;
                 const conditionName = outputData.name;
                 let variableName = "";
-
                 if (inputName !== "assign" && inputName !== "nodeCondition") {
                     if (input_class === "input_1") {
                         num1 = outputNumber;
@@ -237,83 +191,72 @@
                     }
                     let result = operationValues(num1, num2, inputName, inputData);
                     const input_id = inputData.id;
-
-                    editor.value.updateNodeDataFromId(input_id, {result});
+                    editor.value.updateNodeDataFromId(input_id, { result });
                 }
                 else {
                     variableName = inputData.data.variable;
                     total = outputTotal;
                     const nodeAssignData = inputData.data;
                     const nodeAssignId = inputData.id;
-
-                    editor.value.updateNodeDataFromId(nodeAssignId, {...nodeAssignData, assign: total});
+                    editor.value.updateNodeDataFromId(nodeAssignId, { ...nodeAssignData, assign: total });
                 }
                 if (inputName === "nodeCondition" && conditionName === "if") {
                     const conditionResult = validationIf(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2), outputData.data.option);
                     const input_id = inputData.id;
-
-                    editor.value.updateNodeDataFromId(input_id, {conditionResult});
+                    editor.value.updateNodeDataFromId(input_id, { conditionResult });
                 }
                 if (inputName === "nodeCondition" && conditionName === "for") {
                     const conditionResult = validationFor(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2));
                     const input_id = inputData.id;
-
-                    editor.value.updateNodeDataFromId(input_id, {conditionResult});
+                    editor.value.updateNodeDataFromId(input_id, { conditionResult });
                 }
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
-
-            editor.value.on('import', () => {
-                const editorData = editor.value.export().drawflow.Home.data; 
-                let variableName = '';
-
+            editor.value.on("import", () => {
+                const editorData = editor.value.export().drawflow.Home.data;
+                let variableName = "";
                 Object.keys(editorData).forEach(function (i) {
-                    if(editorData[i].name === 'assign') {
+                    if (editorData[i].name === "assign") {
                         variableName = editorData[i].data.variable;
                     }
-                    if(editorData[i].name === 'number') {
-                        if(editorData[i].outputs.output_1.connections[0].output === 'input_1') {
+                    if (editorData[i].name === "number") {
+                        if (editorData[i].outputs.output_1.connections[0].output === "input_1") {
                             num1 = parseFloat(editorData[i].data.number);
                         }
-                        if(editorData[i].outputs.output_1.connections[0].output === 'input_2') {
+                        if (editorData[i].outputs.output_1.connections[0].output === "input_2") {
                             num2 = parseFloat(editorData[i].data.number);
                         }
                     }
                 });
-                javascriptToPython(variableName, editor.value.export(), num1, num2);  
+                javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
-            editor.value.on('nodeRemoved', () => {
-                const editorData = editor.value.export().drawflow.Home.data; 
-                let variableName = '';
-                let result = '';
-
+            editor.value.on("nodeRemoved", () => {
+                const editorData = editor.value.export().drawflow.Home.data;
+                let variableName = "";
+                let result = "";
                 Object.keys(editorData).forEach(function (i) {
-                    if(editorData[i].name === 'addition' || editorData[i].name === 'subtraction' || editorData[i].name === 'division' || editorData[i].name === 'multiplication') {
+                    if (editorData[i].name === "addition" || editorData[i].name === "subtraction" || editorData[i].name === "division" || editorData[i].name === "multiplication") {
                         result = operationValues(num1, num2, editorData[i].name, editorData[i]);
                         const input_id = editorData[i].id;
-
-                        editor.value.updateNodeDataFromId(input_id, {result});
-                    }   
-                    if(editorData[i].name === 'assign') {
-                        variableName = editorData[i].data.variable;
-                        editor.value.updateNodeDataFromId(editorData[i].id, {...editorData[i].data, assign: result});
+                        editor.value.updateNodeDataFromId(input_id, { result });
                     }
-                        javascriptToPython(variableName, editor.value.export(), num1, num2);
-                    })                        
-                })
+                    if (editorData[i].name === "assign") {
+                        variableName = editorData[i].data.variable;
+                        editor.value.updateNodeDataFromId(editorData[i].id, { ...editorData[i].data, assign: result });
+                    }
+                    javascriptToPython(variableName, editor.value.export(), num1, num2);
+                });
             });
-
+        });
         function editorData() {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
-
             let nodesData = [];
             Object.keys(nodes).forEach(function (i) {
                 nodesData.push(nodes[i]);
             });
-            return {programName: programName.value, nodesData};
+            return { programName: programName.value, nodesData };
         }
-
         const setData = async () => {
             fetch("http://localhost:5000/setAllPrograms", {
                 method: "POST",
@@ -321,9 +264,8 @@
                     "Content-type": "application/json",
                 },
                 body: JSON.stringify(editorData())
-            })
+            });
         };
-        
         function showSelected() {
             cleanEditor();
             const validate = store.state.jsImport;
@@ -357,13 +299,11 @@
                     }
                     arrayOfNodesNew.push(newData);
                 });
-                
-                let newObject = {}
+                let newObject = {};
                 arrayOfNodesNew.forEach((element, index) => {
-                    let id = arrayOfNodesNew[index].id
-                    newObject[id] = arrayOfNodesNew[index]
-                })
-
+                    let id = arrayOfNodesNew[index].id;
+                    newObject[id] = arrayOfNodesNew[index];
+                });
                 let data = newObject;
                 const ob = { drawflow: {
                         Home: {
@@ -371,20 +311,17 @@
                         }
                     }
                 };
-
                 showNodes.value = ob;
                 editor.value.reroute = true;
-                editor.value.import(showNodes.value); 
+                editor.value.import(showNodes.value);
             }
         }
-
         function cleanEditor() {
             editor.value.clear();
-            store.commit('setJsToPython', '');
-            store.commit('setJsToPythonCount', '');
-            store.commit('setJsToPythonBucle', []);
+            store.commit("setJsToPython", "");
+            store.commit("setJsToPythonCount", "");
+            store.commit("setJsToPythonBucle", []);
         }
-
         return {
             nodesList,
             drag,
@@ -401,7 +338,7 @@
             editorData
         };
     },
-    // components: { PythonCode }
+    components: { PythonCode }
 }
 </script>
 
@@ -411,7 +348,7 @@
         color:#f7f7f7;
         padding: 5px;
         border-radius: 8px;
-        border: 2px solid #494949;
+        border: 2px solid #2078aa;
         display: block;
         height: 50px;
         margin: 10px 0px;
@@ -421,9 +358,9 @@
     #drawflow {
       text-align:initial;
       width: 100%;
-      height: 98vw;
+      height: 100%;
       background: #f1eeee;
       background-size: 20px 20px;
-      background-image: radial-gradient(#b6b4b4 1px, transparent 1px);      
+      background-image: radial-gradient(#c5c3c3 1px, transparent 1px);
     }
     </style>

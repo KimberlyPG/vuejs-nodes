@@ -8,5 +8,4 @@ export const deleteData = async ()=>{
             'Content-type': 'application/json',
         },
     })
-    // CleanEditor()
 }

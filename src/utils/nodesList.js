@@ -6,7 +6,7 @@ export const nodesList = readonly([
         item: "number",
         input: 0,
         output: 1,
-        number: 0
+        number: 0,
     },
     {
         name: "Addition",
