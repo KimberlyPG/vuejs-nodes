@@ -1,8 +1,6 @@
 <template>
-  <h1 className="flex justify-center text-2xl text-bold text-white bg-blue-500 my-5">Drawflow</h1>
-  <div className="flex">
+  <h1 className="flex justify-center text-2xl text-bold text-sky-600 border-2 my-5">Drawflow</h1>
     <DrawflowDashboard />
-  </div>
 </template>
 
 <script setup>
