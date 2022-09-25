@@ -115,7 +115,7 @@
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
-            let num1 = 0, num2 = 0, total = 0;
+            let num1 = 0, num2 = 0, result = 0;
             editor.value.registerNode("number", <NodeNumber />, {}, {});
             editor.value.registerNode("addition", <NodeOperation title="Addition"/>, {}, {});
             editor.value.registerNode("subtraction", <NodeOperation title="Subtraction"/>, {}, {});
@@ -125,6 +125,7 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
+           
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
@@ -142,6 +143,7 @@
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
+                        
                         if (inputNodeName !== "assign" && inputNodeName !== "nodeCondition") {
                             if (output_class == "input_1") {
                                 num1 = outputNumber;
@@ -149,25 +151,17 @@
                             else if (output_class === "input_2") {
                                 num2 = outputNumber;
                             }
-                            const result = operationValues(num1, num2, inputNodeName, inputNodeData);
+                            result = operationValues(num1, num2, inputNodeName, inputNodeData);
+                            console.log("data changed", result)
                             const input_id = inputNodeData.id;
-                            editor.value.updateNodeDataFromId(input_id, { result: result });
+                            editor.value.updateNodeDataFromId(input_id, {result: result });
                             if (inputNodeData.outputs.output_1.connections.length > 0) {
                                 const nodeAssignId = inputNodeData.outputs.output_1.connections[0].node;
-                                const nodeAssignData = editor.value.getNodeFromId(nodeAssignId);
-                                editor.value.updateNodeDataFromId(nodeAssignId, { ...nodeAssignData, assign: result });
+                                updateNodeAssignData(nodeAssignId, editor.value.getNodeFromId(nodeAssignId).data, result)
                             }
                         }
-                        if (inputNodeName === "nodeCondition" && nodeData.name === "if") {
-                            const conditionResult = validationIf(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2), nodeData.data.option);
-                            const input_id = inputNodeData.id;
-                            editor.value.updateNodeDataFromId(input_id, { conditionResult });
-                        }
-                        if (inputNodeName === "nodeCondition" && nodeData.name === "for") {
-                            const conditionResult = validationFor(parseFloat(nodeData.data.num1), parseFloat(nodeData.data.num2));
-                            const input_id = inputNodeData.id;
-                            editor.value.updateNodeDataFromId(input_id, { conditionResult });
-                        }
+                        setConditionResult(nodeData, inputNodeData, inputNodeName, nodeData.name);
+
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                     }
                 }
@@ -176,40 +170,34 @@
                 console.log(data);
                 const outputData = editor.value.getNodeFromId(data.output_id);
                 const outputNumber = parseFloat(outputData.data.number);
-                const outputTotal = parseFloat(outputData.data.result);
                 const input_class = data.input_class;
-                const inputData = editor.value.getNodeFromId(data.input_id);
-                const inputName = inputData.name;
+                const inputNodeData = editor.value.getNodeFromId(data.input_id);
+                const inputNodeName = inputNodeData.name;
                 const conditionName = outputData.name;
                 let variableName = "";
-                if (inputName !== "assign" && inputName !== "nodeCondition") {
+                
+                if (inputNodeName !== "assign" && inputNodeName !== "nodeCondition") {
                     if (input_class === "input_1") {
                         num1 = outputNumber;
                     }
                     else if (input_class === "input_2") {
                         num2 = outputNumber;
                     }
-                    let result = operationValues(num1, num2, inputName, inputData);
-                    const input_id = inputData.id;
-                    editor.value.updateNodeDataFromId(input_id, { result });
+                    result = operationValues(num1, num2, inputNodeName, inputNodeData);
+                    const input_id = inputNodeData.id;
+                    editor.value.updateNodeDataFromId(input_id, {result});
+
+                    if (inputNodeData.outputs.output_1.connections.length > 0) {
+                        const nodeAssignId = inputNodeData.outputs.output_1.connections[0].node;
+                        updateNodeAssignData(nodeAssignId, editor.value.getNodeFromId(nodeAssignId).data, result)
+                    }
                 }
                 else {
-                    variableName = inputData.data.variable;
-                    total = outputTotal;
-                    const nodeAssignData = inputData.data;
-                    const nodeAssignId = inputData.id;
-                    editor.value.updateNodeDataFromId(nodeAssignId, { ...nodeAssignData, assign: total });
+                    variableName = inputNodeData.data.variable;
+                    updateNodeAssignData(inputNodeData.id, inputNodeData.data, result)
                 }
-                if (inputName === "nodeCondition" && conditionName === "if") {
-                    const conditionResult = validationIf(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2), outputData.data.option);
-                    const input_id = inputData.id;
-                    editor.value.updateNodeDataFromId(input_id, { conditionResult });
-                }
-                if (inputName === "nodeCondition" && conditionName === "for") {
-                    const conditionResult = validationFor(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2));
-                    const input_id = inputData.id;
-                    editor.value.updateNodeDataFromId(input_id, { conditionResult });
-                }
+                setConditionResult(outputData, inputNodeData, inputNodeName, conditionName);
+
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
             });
             editor.value.on("import", () => {
@@ -248,6 +236,26 @@
                 });
             });
         });
+
+        const updateNodeAssignData = (nodeId, nodeData, result) => {
+            const nodeAssignId = nodeId;
+            const nodeAssignData = nodeData;
+            editor.value.updateNodeDataFromId(nodeAssignId, { ...nodeAssignData, assign: result });
+        } 
+        
+        const setConditionResult = (outputData, inputNodeData, inputNodeName, conditionName) => {
+            if (inputNodeName === "nodeCondition" && conditionName === "if") {
+                const conditionResult = validationIf(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2), outputData.data.option);
+                const input_id = inputNodeData.id;
+                editor.value.updateNodeDataFromId(input_id, { conditionResult });
+            }
+            if (inputNodeName === "nodeCondition" && conditionName === "for") {
+                const conditionResult = validationFor(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2));
+                const input_id = inputNodeData.id;
+                editor.value.updateNodeDataFromId(input_id, { conditionResult });
+            }
+        }
+        
         function editorData() {
             const exportdata = editor.value.export();
             const nodes = exportdata.drawflow.Home.data;
