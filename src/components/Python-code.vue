@@ -19,14 +19,20 @@
                 <p>{{this.$store.state.jsToPython.variable}}</p>
                 <p>{{this.$store.state.jsToPython.console}}</p>
                 <p>{{this.$store.state.jsToPython.condition}}</p>
-                <p>&nbsp;{{this.$store.state.jsToPython.result}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.do}}</p>
                 <p>&nbsp;{{this.$store.state.jsToPython.true}}</p>
                 <p>{{this.$store.state.jsToPython.else}}</p>
                 <p>&nbsp;{{this.$store.state.jsToPython.false}}</p>
-                <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
-                <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
+            </div>
+            <div className="w-full bg-black h-[190px] border-2 border-gray-300">
+                <div className="flex bg-sky-600 h-5 border-[1px] border-gray-300">
+                    <img className="w-5" src="../assets/terminal.png" alt="">
+                    <h3 className="text-black text-xs">Python.exe</h3>
+                </div>
+                <div className="text-sm text-green-600 h-[160px] overflow-y-scroll">
+                    <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
                     <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
-                        <p>{{ i.number + " "+ i.variable }}</p>
+                        <p>{{i.variable }}</p>
                     </div>
                 </div>
             </div>

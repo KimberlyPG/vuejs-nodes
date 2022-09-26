@@ -77,13 +77,15 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         if (value.name === "for") {
             pythonCode = {
                 condition: `for x in range(${value.data.num1} , ${value.data.num2}):`,
-                result: "print('Hello world!')",
+                do: "print('Hello world!')",
             }
         }
         if(value.name === "nodeCondition") {
-            pythonCodePrint = {
-                loop: `${value.data.conditionResult}`
-            }
+            if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {
+                pythonCodePrint = {
+                    loop: `${value.data.conditionResult}`
+                }
+            }     
         }
 
         store.commit('setJsToPython', pythonCode);
