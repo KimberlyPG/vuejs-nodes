@@ -41,9 +41,10 @@
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
     import PythonCode from './Python-code.vue'
-    import {javascriptToPython} from '../utils/javascriptToPython'
-    import {validationIf} from '../utils/validationIf'
-    import {validationFor} from '../utils/validationFor'
+    import { javascriptToPython } from '../utils/javascriptToPython'
+    import { javascriptToJava } from '../utils/javascriptToJava'
+    import { validationIf } from '../utils/validationIf'
+    import { validationFor } from '../utils/validationFor'
     import { operationValues } from '@/utils/operationValues'
     import { nodesList } from '../utils/nodesList'
     import { getData } from '../api/getData'
@@ -148,6 +149,7 @@
                     variableName = nodeData.data.variable;
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
+                        javascriptToJava(variableName, editor.value.export(), num1, num2);
                     }
                 }
                 else {
@@ -170,6 +172,7 @@
                         updateNodeCondition(nodeData, inputNodeData, inputNodeName, nodeData.name);
 
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
+                        javascriptToJava(variableName, editor.value.export(), num1, num2);
                     }
                 }
             });
@@ -198,6 +201,7 @@
                 updateNodeCondition(outputData, inputNodeData, inputNodeName, conditionName);
 
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
+                javascriptToJava(variableName, editor.value.export(), num1, num2);
             });
             editor.value.on("import", () => {
                 const editorData = editor.value.export().drawflow.Home.data;
@@ -216,6 +220,7 @@
                     }
                 });
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
+                javascriptToJava(variableName, editor.value.export(), num1, num2);
             });
             editor.value.on("nodeRemoved", () => {
                 const editorData = editor.value.export().drawflow.Home.data;
@@ -232,6 +237,7 @@
                         editor.value.updateNodeDataFromId(editorData[i].id, { ...editorData[i].data, assign: result });
                     }
                     javascriptToPython(variableName, editor.value.export(), num1, num2);
+                    javascriptToJava(variableName, editor.value.export(), num1, num2);
                 });
             });
 

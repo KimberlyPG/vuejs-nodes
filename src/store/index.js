@@ -7,7 +7,9 @@ const store = createStore({
         jsToPythonBucle: [],
         jsImport: {},
         programOptions: [],
-        programId: ''
+        programId: '',
+        jsToJava: '',
+        jsToJavaPrintln: ''
     },
     mutations: {
         setJsToPython(state, value)
@@ -33,6 +35,14 @@ const store = createStore({
         setProgramId(state, value) 
         {
             state.programId = value
+        },
+        setJsToJava(state, value) 
+        {
+            state.jsToJava = value
+        },
+        setJsToJavaPrintln(state, value)
+        {
+            state.jsToJavaPrintln = value
         }
     },
     getters: {
