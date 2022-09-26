@@ -46,9 +46,32 @@ const store = createStore({
         }
     },
     getters: {
-        jsToPythonData: function (state) {
-            return `${state.jsToPython}`
-        } 
+        jsToPythonData (state) {
+            return state.jsToPython
+        },
+        jsToPythonCountData (state) {
+            return state.jsToPythonCount
+        }
+        ,
+        jsToPythonBucleData (state) {
+            return  state.jsToPythonBucle
+        }
+        ,
+        jsImportData (state) {
+            return state.jsImport
+        },
+        programOptionsData (state) {
+            return state.programOptions
+        }, 
+        programIdData (state) {
+            return state.programId
+        },
+        jsToJavaData (state) {
+            return state.jsToJava
+        },
+        jsToJavaPrintlnData (state) {
+            return state.jsToJavaPrintln
+        }
     }
 });
 
