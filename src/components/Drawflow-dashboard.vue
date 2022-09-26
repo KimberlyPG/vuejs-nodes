@@ -1,5 +1,5 @@
 <template>
-    <div className="h-full w-full mx-2">
+    <div className="h-full w-full">
         <div className="flex justify-end mb-3 text-lg text-gray-100">
             <input className="text-sm mr-2 rounded-sm text-gray-700 hover:bg-gray-100" placeholder="Add program name" @input="addProgramName($event)" v-model="nodeProgramName" />
             <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="setData()" :disabled="!nodeProgramName.length">
@@ -13,12 +13,12 @@
         </div>
         
         <div class="h-3/4 flex flex-row w-full">
-            <div className="w-[190px] text-sm mx-auto p-2">
+            <div className="w-[190px] mx-auto p-2 text-sm">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
                     <span class="node" :style="`background: ${i.color}`">{{ i.name }}</span>
                 </div>
             </div>
-            <div className="h-[700px] w-full mx-2 relative">
+            <div className="drawflow-container w-full mx-2 relative">
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
                 <button className="absolute w-20 bg-blue-400 m-2 rounded-md text-white text-sm right-0 top-0 hover:bg-blue-300" @click="cleanEditor()">Clear</button>
             </div>
@@ -66,13 +66,15 @@
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
-        let node_move_select = "";
-        let node_last_move = null;
+        
+        let node_select = "", node_last_move = null;
+        function touchScreenPosition(ev) {
+            node_last_move = ev;
+        }
 
         const drag = (ev) => {
             if (ev.type === "touchstart") {
-                console.log("drag", ev);
-                node_move_select = ev.target.closest(".nodes-list").getAttribute("node-item");
+                node_select = ev.target.closest(".nodes-list").getAttribute('node-item');
             }
             else {
                 ev.dataTransfer.setData("node", ev.target.getAttribute("node-item"));
@@ -85,16 +87,15 @@
 
         const drop = (ev) => {
             if (ev.type === "touchend") {
-                console.log("drop", ev);
                 let parentdrawflow = document.elementFromPoint(node_last_move.touches[0].clientX, node_last_move.touches[0].clientY).closest("#drawflow");
                 if (parentdrawflow != null) {
-                    addNodeToDrawFlow(node_move_select, node_last_move.touches[0].clientX, node_last_move.touches[0].clientY);
+                    addNodeToDrawFlow(node_select, node_last_move.touches[0].clientX, node_last_move.touches[0].clientY);
                 }
             }
             else {
                 ev.preventDefault();
                 let data = ev.dataTransfer.getData("node");
-                addNodeToDrawFlow(data, ev.clientX, ev.clientY); //node name, x pos, y pos
+                addNodeToDrawFlow(data, ev.clientX, ev.clientY); 
             }
         };
 
@@ -118,10 +119,17 @@
         };
 
         onMounted(() => {
+            var elements = document.getElementsByClassName('nodes-list');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('touchend', drop, false);
+                elements[i].addEventListener('touchmove', touchScreenPosition, false);
+                elements[i].addEventListener('touchstart', drag, false );
+            }
+
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
-            let num1 = 0, num2 = 0, result = 0;
+
             editor.value.registerNode("number", <NodeNumber />, {}, {});
             editor.value.registerNode("addition", <NodeOperation title="Addition"/>, {}, {});
             editor.value.registerNode("subtraction", <NodeOperation title="Subtraction"/>, {}, {});
@@ -131,7 +139,8 @@
             editor.value.registerNode("if", <NodeIf title="If statement"/>, {}, {});
             editor.value.registerNode("for", <NodeFor title="For statement"/>, {}, {});
             editor.value.registerNode("nodeCondition", <NodeCondition />, {}, {});
-           
+            
+            let num1 = 0, num2 = 0, result = 0;
             editor.value.on("nodeDataChanged", (data) => {
                 const nodeData = editor.value.getNodeFromId(data);
                 let variableName = "";
@@ -149,7 +158,7 @@
                         const inputNodeId = nodeData.outputs.output_1.connections[0].node;
                         const inputNodeData = editor.value.getNodeFromId(inputNodeId);
                         const inputNodeName = inputNodeData.name;
-                        console.log("inputnode", inputNodeName)
+
                         if (inputNodeName !== "nodeCondition") {
                             updateNodeOperation(output_class, outputNumber, inputNodeName, inputNodeData)
 
@@ -347,7 +356,8 @@
             deleteData,
             store,
             addProgramName,
-            editorData, style
+            editorData, 
+            style
         };
     },
     components: { PythonCode }
@@ -358,7 +368,6 @@
     .node {
         background-color: #4a8ac2;
         color:#f7f7f7;
-        font-size: medium;
         padding: 5px;
         border-radius: 8px;
         border: 2px solid #4b769bc4;
@@ -366,6 +375,23 @@
         height: 50px;
         margin: 10px 0px;
         cursor: move;
+    }
+    @media only screen and (min-width: 350px) {
+        .node {
+            font-size: small;
+        }
+        .drawflow-container {
+            height: 500px;
+        }
+    }
+
+    @media only screen and (min-width: 600px) {
+        .node {
+            font-size: medium;
+        }
+        .drawflow-container {
+            height: 700px;
+        }
     }
 
     .node:hover {

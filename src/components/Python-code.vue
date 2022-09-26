@@ -1,5 +1,5 @@
 <template>
-    <div className="bg-white text-black w-1/4 flex">
+    <div className="python-container flex bg-white text-black w-1/4">
         <div className="">
             <div className="flex">
                 <img 
@@ -38,3 +38,17 @@
         name: 'PythonCode',
     }
 </script>
+
+<style scoped>
+    @media only screen and (min-width: 350px) {
+        .python-container {
+            display: none
+        }
+    }
+
+    @media only screen and (min-width: 900px) {
+        .python-container {
+            display: inline
+        }
+    }
+</style>
