@@ -12,7 +12,7 @@
                 </h3>
             </div>
 
-            <div className="text-gray-600">
+            <div className="text-gray-600 p-4">
                 <p>{{this.$store.state.jsToPython.num1}}</p>
                 <p>{{this.$store.state.jsToPython.num2}}</p>
                 <p>{{this.$store.state.jsToPython.operation}}</p>
