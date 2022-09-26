@@ -22,7 +22,7 @@
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
                 <button className="absolute w-20 bg-blue-400 m-2 rounded-md text-white text-sm right-0 top-0 hover:bg-blue-300" @click="cleanEditor()">Clear</button>
             </div>
-            <PythonCode />
+            <LanguagesCode />
         </div>
     </div>    
 </template>
@@ -40,7 +40,7 @@
     import NodeIf from './Node-if.vue'
     import NodeCondition from './Node-condition.vue'
     import NodeFor from './Node-for.vue'
-    import PythonCode from './Python-code.vue'
+    import LanguagesCode from './Languages-code.vue'
     import { javascriptToPython } from '../utils/javascriptToPython'
     import { javascriptToJava } from '../utils/javascriptToJava'
     import { validationIf } from '../utils/validationIf'
@@ -272,8 +272,6 @@
                 }
             }
         });
-
-
         
         function editorData() {
             const exportdata = editor.value.export();
@@ -366,7 +364,7 @@
             style
         };
     },
-    components: { PythonCode }
+    components: { LanguagesCode }
 }
 </script>
 

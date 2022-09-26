@@ -66,7 +66,7 @@
                     <p>{{this.$store.state.jsToPython.console}}</p>
                     <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
                     <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
-                        <p>{{i.number + i.variable }}</p>
+                        <p>{{i.number +" "+i.variable }}</p>
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
 
 <script>
     export default {
-        name: 'PythonCode',
+        name: 'LanguagesCode',
         data () {
             return {
                 toggle: false
