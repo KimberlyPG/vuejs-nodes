@@ -1,7 +1,7 @@
 <template>
     <div className="h-full w-full mx-2">
         <div className="flex justify-end mb-3 text-lg text-gray-100">
-            <input className="text-sm mr-2 rounded-sm" placeholder="Add program name" @input="addProgramName($event)" v-model="nodeProgramName" />
+            <input className="text-sm mr-2 rounded-sm text-gray-700" placeholder="Add program name" @input="addProgramName($event)" v-model="nodeProgramName" />
             <button className="w-32 bg-green-500 mr-3 rounded-md" @click="setData()" :disabled="!nodeProgramName.length">
                 Save
             </button>
