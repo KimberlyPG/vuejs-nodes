@@ -1,13 +1,13 @@
 <template>
-    <div className="python-container flex bg-white text-black w-1/4">
+    <div className="python-container flex bg-white text-black w-1/4 mr-3">
         <div className="">
             <div className="flex">
                 <img 
-                    className="w-10"
+                    className="w-8"
                     src='../assets/python.jpg' 
                     alt=""
                 >
-                <h3 className="text-gray-700">
+                <h3 className="text-gray-600 ml-2">
                     Python code
                 </h3>
             </div>
