@@ -17,7 +17,7 @@
                 <p>{{this.$store.state.jsToPython.num2}}</p>
                 <p>{{this.$store.state.jsToPython.operation}}</p>
                 <p>{{this.$store.state.jsToPython.variable}}</p>
-                <p>{{this.$store.state.jsToPython.condition}}</p>
+                <p>{{this.$store.state.jsToPython.console}}</p>
                 <p className="ml-5">{{this.$store.state.jsToPython.true}}</p>
                 <p>{{this.$store.state.jsToPython.else}}</p>
                 <p className="ml-5">{{this.$store.state.jsToPython.false}}</p>

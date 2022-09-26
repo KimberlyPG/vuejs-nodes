@@ -30,8 +30,9 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             pythonCode = {
                 num1: `num1 = ${number1}`,
                 num2: `num2 = ${number2}`,
-                operation: "# addition = num1 + num2",
-                variable: `${assignName === undefined || assignName === "" ? "add" : assignName} = ${total}`
+                operation: `${assignName === undefined || assignName === "" ? "addition" : assignName} = num1 + num2`,          
+                variable: `print("The result is: ", ${assignName === undefined || assignName === "" ? "addition" : assignName})`,
+                console: `The result is: ${total}`
             }
         }
         if (value.name === "subtraction") {
@@ -39,8 +40,9 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             pythonCode = {
                 num1: `num1 = ${number1}`,
                 num2: `num2 = ${number2}`,
-                operation: "# subtraction = num1 - num2",
-                variable: `${assignName === undefined || assignName === "" ? "sub" : assignName} = ${total}`
+                operation: `${assignName === undefined || assignName === "" ? "subtraction" : assignName} = num1 - num2`, 
+                variable: `print("The result is: ", ${assignName === undefined || assignName === "" ? "subtraction" : assignName})`,
+                console: `The result is: ${total}`
             }
         }
         if (value.name === "multiplication") {
@@ -48,8 +50,9 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             pythonCode = {
                 num1: `num1 = ${number1}`,
                 num2: `num2 = ${number2}`,
-                operation: "# multiplication = num1 * num2",
-                variable: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = ${total}`
+                operation: `${assignName === undefined || assignName === "" ? "multiplication" : assignName} = num1 * num2`, 
+                variable: `print("The result is: ", ${assignName === undefined || assignName === "" ? "multiplication" : assignName})`,
+                console: `The result is: ${total}`
             }
         }
         if (value.name === "division") {
@@ -57,8 +60,9 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             pythonCode = {
                 num1: `num1 = ${number1}`,
                 num2: `num2 = ${number2}`,
-                operation: "# division = num1 / num2",
-                variable: `${assignName === undefined || assignName === "" ? "division" : assignName} = ${total}`
+                operation: `${assignName === undefined || assignName === "" ? "division" : assignName} = num1 / num2`, 
+                variable: `print("The result is: ", ${assignName === undefined || assignName === "" ? "division" : assignName})`,
+                console: `The result is: ${total}`
             }
         }
         if (value.name === "if") {
