@@ -17,7 +17,6 @@
                 <p>{{this.$store.state.jsToPython.num2}}</p>
                 <p>{{this.$store.state.jsToPython.operation}}</p>
                 <p>{{this.$store.state.jsToPython.variable}}</p>
-                <p>{{this.$store.state.jsToPython.console}}</p>
                 <p>{{this.$store.state.jsToPython.condition}}</p>
                 <p>&nbsp;{{this.$store.state.jsToPython.do}}</p>
                 <p>&nbsp;{{this.$store.state.jsToPython.true}}</p>
@@ -30,6 +29,7 @@
                     <h3 className="text-black text-xs">Python.exe</h3>
                 </div>
                 <div className="text-sm text-green-600 h-[160px] overflow-y-scroll">
+                    <p>{{this.$store.state.jsToPython.console}}</p>
                     <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
                     <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
                         <p>{{i.variable }}</p>
