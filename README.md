@@ -1,8 +1,7 @@
 # Visit the demo:
 https://courageous-torrone-f27ee2.netlify.app/
 
-![image](https://user-images.githubusercontent.com/65067847/192194079-33f5499a-26b1-4466-a240-69f1e39ab457.png)
-
+![image](https://user-images.githubusercontent.com/65067847/192219852-ddd5cc3a-6cfe-4eb1-85a4-ba4792772746.png)
 
 # vuejs-drawflow
 
