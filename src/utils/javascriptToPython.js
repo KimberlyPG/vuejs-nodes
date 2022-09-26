@@ -65,14 +65,14 @@ export function javascriptToPython(variableName, editor, num1, num2) {
             let signOperator = value.data.option;
             pythonCode = {
                 condition: `if ${value.data.num1} ${signOperator} ${value.data.num2}:`,
-                true: "print(true)",
+                true: "print('true')",
                 else: "else:",
-                false:"print(false)" 
+                false:"print('false')" 
             }
         }
         if (value.name === "for") {
             pythonCode = {
-                condition: `for ${value.data.num1} in ${value.data.num2}:`,
+                condition: `for x in range(${value.data.num1} , ${value.data.num2}):`,
                 result: `print('Hello world!')`,
             }
         }
