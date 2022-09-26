@@ -12,16 +12,16 @@
                 <h3 className="text-gray-600 ml-2">Java code</h3>
             </div>
             <div className="text-gray-600 p-4 h-52 text-base">
-                <p>{{this.$store.jsToJavaData.num1}}</p>
-                <p>{{this.$store.jsToJavaData.num2}}</p>
-                <p>{{this.$store.jsToJavaData.operation}}</p>
-                <p>{{this.$store.jsToJavaData.variable}}</p>
-                <p>{{this.$store.jsToJavaData.condition}}</p>
-                <p>&nbsp;&nbsp;&nbsp;{{this.$store.jsToJavaData.do}}</p>
-                <p>{{this.$store.jsToJavaData.true}}</p>
-                <p>{{this.$store.jsToJavaData.else}}</p>
-                <p>{{this.$store.jsToJavaData.false}}</p>
-                <p>{{this.$store.jsToJavaData.close}}</p>
+                <p>{{this.$store.state.jsToJava.num1}}</p>
+                <p>{{this.$store.state.jsToJava.num2}}</p>
+                <p>{{this.$store.state.jsToJava.operation}}</p>
+                <p>{{this.$store.state.jsToJava.variable}}</p>
+                <p>{{this.$store.state.jsToJava.condition}}</p>
+                <p>&nbsp;&nbsp;&nbsp;{{this.$store.state.jsToJava.do}}</p>
+                <p>{{this.$store.state.jsToJava.true}}</p>
+                <p>{{this.$store.state.jsToJava.else}}</p>
+                <p>{{this.$store.state.jsToJava.false}}</p>
+                <p>{{this.$store.state.jsToJava.close}}</p>
             </div>
             <div className="w-full bg-black h-[190px] border-2 border-gray-300">
                 <div className="flex bg-sky-600 h-5 border-[1px] border-gray-300">
@@ -29,9 +29,9 @@
                     <h3 className="text-black text-xs">Java.exe</h3>
                 </div>
                 <div className="text-sm text-green-600 h-[160px] overflow-y-scroll">
-                    <p>{{this.$store.jsToJavaData.console}}</p>
-                    <p className="text-sm mt-4 mb-2">{{this.$store.jsToJavaPrintlnData.consoleResult}}</p>
-                    <div v-for="i in this.$store.jsToPythonBucleData" :key="i.number">
+                    <p>{{this.$store.state.jsToJava.console}}</p>
+                    <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToJavaPrintln.consoleResult}}</p>
+                    <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
                         <p>{{i.variable }}</p>
                     </div>
                 </div>
@@ -47,15 +47,15 @@
                 <h3 className="text-gray-600 ml-2">Python code</h3>
             </div>
             <div className="text-gray-600 p-4 h-52 text-base">
-                <p>{{this.$store.jsToPythonData.num1}}</p>
-                <p>{{this.$store.jsToPythonData.num2}}</p>
-                <p>{{this.$store.jsToPythonData.operation}}</p>
-                <p>{{this.$store.jsToPythonData.variable}}</p>
-                <p>{{this.$store.jsToPythonData.condition}}</p>
-                <p>&nbsp;{{this.$store.jsToPythonData.do}}</p>
-                <p>&nbsp;{{this.$store.jsToPythonData.true}}</p>
-                <p>{{this.$store.jsToPythonData.else}}</p>
-                <p>&nbsp;{{this.$store.jsToPythonData.false}}</p>
+                <p>{{this.$store.state.jsToPython.num1}}</p>
+                <p>{{this.$store.state.jsToPython.num2}}</p>
+                <p>{{this.$store.state.jsToPython.operation}}</p>
+                <p>{{this.$store.state.jsToPython.variable}}</p>
+                <p>{{this.$store.state.jsToPython.condition}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.do}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.true}}</p>
+                <p>{{this.$store.state.jsToPython.else}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.false}}</p>
             </div>
             <div className="w-full bg-black h-[190px] border-2 border-gray-300">
                 <div className="flex bg-sky-600 h-5 border-[1px] border-gray-300">
@@ -63,9 +63,9 @@
                     <h3 className="text-black text-xs">Python.exe</h3>
                 </div>
                 <div className="text-sm text-green-600 h-[160px] overflow-y-scroll">
-                    <p>{{this.$store.jsToPythonData.console}}</p>
-                    <p className="text-sm mt-4 mb-2">{{this.$store.jsToPythonCountData.loop}}</p>
-                    <div v-for="i in this.$store.jsToPythonBucleData" :key="i.number">
+                    <p>{{this.$store.state.jsToPython.console}}</p>
+                    <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
+                    <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
                         <p>{{i.number +" "+i.variable }}</p>
                     </div>
                 </div>

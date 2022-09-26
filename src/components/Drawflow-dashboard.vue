@@ -7,7 +7,7 @@
             </button>
             <select className="w-32 bg-blue-400 mr-3 rounded-md hover:bg-blue-300 cursor-pointer" @click="getData()" @change="valueSelected($event)">
                     <option value="Select" className="text-center">Choose</option>
-                    <option v-for="j in store.programOptionsData" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
+                    <option v-for="j in store.state.programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
             </select>
             <button className="w-32 bg-red-400 mr-3 rounded-md hover:bg-red-300" @click="deleteData(); cleanEditor(); getData()">Delete</button>
         </div>
@@ -111,7 +111,7 @@
 
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            store.commit("setProgramId", store.programOptionsData[optionSelected.value].name);
+            store.commit("setProgramId", store.state.programOptions[optionSelected.value].name);
             showSelected();
         };
 
@@ -293,7 +293,7 @@
         };
         function showSelected() {
             cleanEditor();
-            const validate = store.jsImportData;
+            const validate = store.state.jsImport;
             if (!!validate === true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
