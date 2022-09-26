@@ -18,11 +18,11 @@
                 <p>{{this.$store.state.jsToPython.operation}}</p>
                 <p>{{this.$store.state.jsToPython.variable}}</p>
                 <p>{{this.$store.state.jsToPython.console}}</p>
-                <p className="ml-5">{{this.$store.state.jsToPython.true}}</p>
-                <p>{{this.$store.state.jsToPython.else}}</p>
-                <p className="ml-5">{{this.$store.state.jsToPython.false}}</p>
                 <p>{{this.$store.state.jsToPython.condition}}</p>
-                <p className="ml-5">{{this.$store.state.jsToPython.result}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.result}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.true}}</p>
+                <p>{{this.$store.state.jsToPython.else}}</p>
+                <p>&nbsp;{{this.$store.state.jsToPython.false}}</p>
                 <p className="text-sm mt-4 mb-2">{{this.$store.state.jsToPythonCount.loop}}</p>
                 <div className="text-sm text-black h-52 overflow-y-scroll scrollbar-hide">
                     <div v-for="i in this.$store.state.jsToPythonBucle" :key="i.number">
