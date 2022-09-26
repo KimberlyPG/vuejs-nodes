@@ -1,0 +1,38 @@
+.drawflow .drawflow-node {
+    border-radius: 8px;
+    background: #2b85c0;
+    border: 2px solid #2d495c9a;
+    color: rgb(27, 26, 26);
+    min-width: 100px;
+}
+
+.drawflow .drawflow-node .drawflow_content_node #node-title {
+    color: rgb(255, 255, 255);
+}
+
+.drawflow .drawflow-node.selected {
+    background: #0053ff;
+    border: 2px solid #0053ff;
+}
+
+.drawflow .drawflow-node .input, .drawflow .drawflow-node .output {
+    background: #f0068e;
+    border: 3px solid hsla(321, 96%, 40%, 0.733);
+}
+
+
+.drawflow .drawflow-node .output:hover, .drawflow .drawflow-node .input:hover {
+    background: #e4b417;
+    border: 2px solid rgb(250, 0, 175);
+}
+
+.drawflow .connection .main-path {
+    stroke-width: 2px;
+    stroke: #e4b417;
+}
+
+.drawflow .connection .main-path:hover {
+    stroke: rgb(250, 0, 175);
+} 
+
+

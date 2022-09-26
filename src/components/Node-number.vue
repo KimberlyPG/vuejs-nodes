@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p className="text-sm">Number</p>
+        <p id="node-title" className="text-sm">Number</p>
         <input class="number-class w-full" type="number" df-number />
     </div>
 </template>

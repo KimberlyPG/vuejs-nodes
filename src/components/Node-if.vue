@@ -1,7 +1,7 @@
 <template>
-    <h2 className="text-sm">{{ title }}</h2>
+    <h2 id="node-title" className="text-sm">{{ title }}</h2>
     <p className="text-xs">If else</p>
-    <div className="w-64 space-between">
+    <div className="w-64 space-between text-black">
         <input className="w-10 mr-2 h-7" type="number" df-num1>
             <select df-option className="h-7" name="" id="">
                 <option value="-">-</option>

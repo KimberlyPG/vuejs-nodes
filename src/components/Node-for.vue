@@ -1,5 +1,5 @@
 <template>
-    <h2 className="text-sm">{{ title }}</h2>
+    <h2 id="node-title" className="text-sm">{{ title }}</h2>
     <p className="text-xs">For</p>
     <div className="w-64 space-between">
         <input className="w-10 mr-2 h-7 text-sm" type="number" placeholder="Start" df-num1>

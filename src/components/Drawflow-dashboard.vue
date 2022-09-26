@@ -15,10 +15,10 @@
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[190px] text-sm mx-auto p-2">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
-                    <span class="node">{{ i.name }}</span>
+                    <span class="node" :style="`background: ${i.color}`">{{ i.name }}</span>
                 </div>
             </div>
-            <div class="h-[700px] w-full mx-2 relative">
+            <div className="h-[700px] w-full mx-2 relative">
                 <div id="drawflow" @drop="drop($event)" @dragover="allowDrop($event)"></div>
                 <button className="absolute w-20 bg-blue-400 m-2 rounded-md text-white text-sm right-0 top-0" @click="cleanEditor()">Clear</button>
             </div>
@@ -33,6 +33,7 @@
     import Drawflow from 'drawflow'
     // eslint-disable-next-line no-unused-vars
     import styleDrawflow from 'drawflow/dist/drawflow.min.css' 
+    import style from '../assets/style.css' 
     import NodeNumber from './Node-number.vue'
     import NodeOperation from './Node-operation.vue'
     import NodeAssign from './Node-assign.vue'
@@ -315,10 +316,10 @@
                     let id = arrayOfNodesNew[index].id;
                     newObject[id] = arrayOfNodesNew[index];
                 });
-                let data = newObject;
+
                 const ob = { drawflow: {
                         Home: {
-                            data
+                            data: newObject
                         }
                     }
                 };
@@ -346,7 +347,7 @@
             deleteData,
             store,
             addProgramName,
-            editorData
+            editorData, style
         };
     },
     components: { PythonCode }
@@ -355,11 +356,12 @@
 
 <style scoped>
     .node {
-        background-color: rgb(74, 138, 194);
+        background-color: #4a8ac2;
         color:#f7f7f7;
+        font-size: medium;
         padding: 5px;
         border-radius: 8px;
-        border: 2px solid #2078aa;
+        border: 2px solid #4b769bc4;
         display: block;
         height: 50px;
         margin: 10px 0px;
@@ -374,4 +376,4 @@
       background-size: 20px 20px;
       background-image: radial-gradient(#c5c3c3 1px, transparent 1px);
     }
-    </style>
+</style>
