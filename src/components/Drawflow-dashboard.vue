@@ -43,6 +43,7 @@
     import LanguagesCode from './Languages-code.vue'
     import { javascriptToPython } from '../utils/javascriptToPython'
     import { javascriptToJava } from '../utils/javascriptToJava'
+    import { javascriptToCplus } from '../utils/javascriptToCplus'
     import { validationIf } from '../utils/validationIf'
     import { validationFor } from '../utils/validationFor'
     import { operationValues } from '@/utils/operationValues'
@@ -150,6 +151,7 @@
                     if (nodeData.inputs.input_1.connections.length > 0) {
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                         javascriptToJava(variableName, editor.value.export(), num1, num2);
+                        javascriptToCplus(variableName, editor.value.export(), num1, num2);
                     }
                 }
                 else {
@@ -173,6 +175,7 @@
 
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                         javascriptToJava(variableName, editor.value.export(), num1, num2);
+                        javascriptToCplus(variableName, editor.value.export(), num1, num2);
                     }
                 }
             });
@@ -202,6 +205,7 @@
 
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
                 javascriptToJava(variableName, editor.value.export(), num1, num2);
+                javascriptToCplus(variableName, editor.value.export(), num1, num2);
             });
             editor.value.on("import", () => {
                 const editorData = editor.value.export().drawflow.Home.data;
@@ -221,6 +225,7 @@
                 });
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
                 javascriptToJava(variableName, editor.value.export(), num1, num2);
+                javascriptToCplus(variableName, editor.value.export(), num1, num2);
             });
             editor.value.on("nodeRemoved", () => {
                 const editorData = editor.value.export().drawflow.Home.data;
@@ -238,6 +243,7 @@
                     }
                     javascriptToPython(variableName, editor.value.export(), num1, num2);
                     javascriptToJava(variableName, editor.value.export(), num1, num2);
+                    javascriptToCplus(variableName, editor.value.export(), num1, num2);
                 });
             });
 

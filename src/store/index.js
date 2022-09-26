@@ -9,12 +9,14 @@ const store = createStore({
         programOptions: [],
         programId: '',
         jsToJava: '',
-        jsToJavaPrintln: ''
+        jsToJavaPrintln: '',
+        jsToCplus: '',
+        jsToCplusCout: '',
     },
     mutations: {
         setJsToPython(state, value)
         {
-            state.jsToPython = value;
+            state.jsToPython = value
         },
         setJsToPythonCount(state, value) 
         {
@@ -43,6 +45,14 @@ const store = createStore({
         setJsToJavaPrintln(state, value)
         {
             state.jsToJavaPrintln = value
+        },
+        setJsToCplus(state, value) 
+        {
+            state.jsToCplus = value
+        },
+        setJsToCplusCout(state, value)
+        {
+            state.jsToCplusCout = value
         }
     },
     getters: {
@@ -71,6 +81,12 @@ const store = createStore({
         },
         jsToJavaPrintlnData (state) {
             return state.jsToJavaPrintln
+        },
+        jsToCplusData (state) {
+            return state.jsToCplus
+        },
+        jsToCplusCout (state) {
+            return state.jsToCplusCout
         }
     }
 });
