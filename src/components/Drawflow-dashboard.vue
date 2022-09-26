@@ -2,12 +2,12 @@
     <div className="h-full w-full">
         <div className="flex justify-end mb-3 text-lg text-gray-100">
             <input className="text-sm mr-2 rounded-sm text-gray-700 hover:bg-gray-100" placeholder="Add program name" @input="addProgramName($event)" v-model="nodeProgramName" />
-            <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="setData()" :disabled="!nodeProgramName.length">
+            <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="setData(); nodeProgramName=''" :disabled="!nodeProgramName.length">
                 Save
             </button>
             <select className="w-32 bg-blue-400 mr-3 rounded-md hover:bg-blue-300 cursor-pointer" @click="getData()" @change="valueSelected($event)">
                     <option value="Select" className="text-center">Choose</option>
-                    <option v-for="j in store.state.programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
+                    <option v-for="j in store.getters.programOptionsData" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
             </select>
             <button className="w-32 bg-red-400 mr-3 rounded-md hover:bg-red-300" @click="deleteData(); cleanEditor(); getData()">Delete</button>
         </div>
@@ -111,7 +111,7 @@
 
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            store.commit("setProgramId", store.state.programOptions[optionSelected.value].name);
+            store.commit("setProgramId", store.getters.programOptionsData[optionSelected.value].name);
             showSelected();
         };
 
@@ -293,7 +293,7 @@
         };
         function showSelected() {
             cleanEditor();
-            const validate = store.state.jsImport;
+            const validate = store.getters.jsImportData;
             if (!!validate === true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
@@ -346,6 +346,8 @@
             store.commit("setJsToPython", "");
             store.commit("setJsToPythonCount", "");
             store.commit("setJsToPythonBucle", []);
+            store.commit("setJsToJava", "");
+            store.commit("setJsToJavaPrintln", "");
         }
         return {
             nodesList,
