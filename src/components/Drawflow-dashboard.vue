@@ -5,7 +5,6 @@
             <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="verifyProgramName(nodeProgramName); nodeProgramName=''">
                 Save
             </button>
-            <button @click="verifyProgramName();">a</button>
             <select className="w-32 bg-blue-400 mr-3 rounded-md hover:bg-blue-300 cursor-pointer" @click="getData()" @change="valueSelected($event)">
                     <option value="Select" className="text-center">Choose</option>
                     <option v-for="j in store.getters.programOptionsData" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
