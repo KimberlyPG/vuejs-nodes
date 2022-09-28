@@ -2,9 +2,10 @@
     <div className="h-full w-full">
         <div className="flex justify-end mb-3 text-lg text-gray-100">
             <input className="text-sm mr-2 rounded-sm text-gray-700 hover:bg-gray-100" placeholder="Add program name" @input="addProgramName($event)" v-model="nodeProgramName" />
-            <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="setData(); nodeProgramName=''" :disabled="!nodeProgramName.length">
+            <button className="w-32 bg-green-500 mr-3 rounded-md hover:bg-green-400 cursor-pointer" @click="verifyProgramName(nodeProgramName); nodeProgramName=''">
                 Save
             </button>
+            <button @click="verifyProgramName();">a</button>
             <select className="w-32 bg-blue-400 mr-3 rounded-md hover:bg-blue-300 cursor-pointer" @click="getData()" @change="valueSelected($event)">
                     <option value="Select" className="text-center">Choose</option>
                     <option v-for="j in store.getters.programOptionsData" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
@@ -13,7 +14,7 @@
         </div>
         
         <div class="h-3/4 flex flex-row w-full">
-            <div className="w-[190px] mx-auto p-2 text-sm">
+            <div className="w-[200px] mx-auto p-2 text-sm">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
                     <span class="node" :style="`background: ${i.color}`">{{ i.name }}</span>
                 </div>
@@ -119,6 +120,13 @@
         const addProgramName = (event) => {
             programName.value = event.target.value;
         };
+
+        function verifyProgramName(nodeProgramName) {
+            if(nodeProgramName.length == 0) {
+                return alert("Name your program");
+            }
+            else setData();
+        }
 
         onMounted(() => {
             var elements = document.getElementsByClassName('nodes-list');
@@ -355,6 +363,7 @@
             store.commit("setJsToJava", "");
             store.commit("setJsToJavaPrintln", "");
         }
+
         return {
             nodesList,
             drag,
@@ -369,7 +378,8 @@
             store,
             addProgramName,
             editorData, 
-            style
+            style,
+            verifyProgramName
         };
     },
     components: { LanguagesCode }
