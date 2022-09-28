@@ -32,7 +32,7 @@ export function javascriptToPython(variableName, editor, num1, num2) {
                 num2: `num2 = ${number2}`,
                 operation: `${assignName === undefined || assignName === "" ? "addition" : assignName} = num1 + num2`,          
                 variable: `print("The result is: ", ${assignName === undefined || assignName === "" ? "addition" : assignName})`,
-                console: `The result is: ${total}`
+                console: `The result is: ${total}`           
             }
         }
         if (value.name === "subtraction") {
@@ -82,13 +82,13 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         }
         if(value.name === "nodeCondition") {
             if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {
-                pythonCodePrint = {
+                pythonCode = { ...pythonCode,
                     loop: `${value.data.conditionResult}`
                 }
             }     
         }
 
         store.commit('setJsToPython', pythonCode);
-        store.commit('setJsToPythonCount', pythonCodePrint);
+        store.commit('setJsToPythonPrint', pythonCodePrint);
     });
 }

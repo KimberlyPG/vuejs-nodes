@@ -3,7 +3,7 @@ import { createStore } from 'vuex'
 const store = createStore({
     state: {
         jsToPython: '',
-        jsToPythonCount: '',
+        jsToPythonPrint: '',
         jsToPythonBucle: [],
         jsImport: {},
         programOptions: [],
@@ -18,9 +18,9 @@ const store = createStore({
         {
             state.jsToPython = value
         },
-        setJsToPythonCount(state, value) 
+        setJsToPythonPrint(state, value) 
         {
-            state.jsToPythonCount = value
+            state.jsToPythonPrint = value
         },
         setJsToPythonBucle(state, value)
         {
@@ -59,8 +59,8 @@ const store = createStore({
         jsToPythonData (state) {
             return state.jsToPython
         },
-        jsToPythonCountData (state) {
-            return state.jsToPythonCount
+        jsToPythonPrint (state) {
+            return state.jsToPythonPrint
         }
         ,
         jsToPythonBucleData (state) {

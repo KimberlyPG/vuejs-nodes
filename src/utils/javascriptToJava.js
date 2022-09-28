@@ -84,7 +84,7 @@ export function javascriptToJava(variableName, editor, num1, num2) {
         }
         if(value.name === "nodeCondition") {
             if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {
-                javaCodePrintln = {
+                javaCode = {...javaCode,
                     consoleResult: `${value.data.conditionResult}`
                 }
             }     

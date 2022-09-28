@@ -73,7 +73,6 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
                 else: "} else {",
                 false:'std::cout << "false";',
                 close: "}", 
-                return: "return 0"
             }
         }
         if (value.name === "for") {
@@ -82,10 +81,11 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
                 do: 'std::cout <<"\nhello world!";',
                 close: "}"
             }
+            // store.commit('setJsToCplus', '');
         }
         if(value.name === "nodeCondition") {
             if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {
-                cCodeCout = {
+                cCode = {...cCode,
                     consoleResult: `${value.data.conditionResult}`
                 }
             }     
