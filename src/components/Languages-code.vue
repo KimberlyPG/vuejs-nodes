@@ -16,7 +16,7 @@
                 <ul>
                     <li v-for="(value, prop) in this.$store.getters.jsToCplusData" :key="value">
                         <p v-if= "prop === 'true' || prop === 'false' || prop === 'do'">&nbsp;&nbsp;&nbsp;{{value}}</p>
-                        <p v-else-if="prop!=='console'">{{ value }}</p>          
+                        <p v-else-if="prop !== 'console' && prop !== 'consoleResult'">{{ value }}</p>          
                     </li>
                 </ul>
             </div>
@@ -47,7 +47,7 @@
                 <ul>
                     <li v-for="(value, prop) in this.$store.getters.jsToJavaData" :key="value">
                         <p v-if= "prop === 'true' || prop === 'false' || prop === 'do'">&nbsp;&nbsp;&nbsp;{{value}}</p>
-                        <p v-else-if="prop!=='console'">{{ value }}</p>          
+                        <p v-else-if="prop !== 'console' && prop !== 'consoleResult'">{{ value }}</p>          
                     </li>
                 </ul>
             </div>
@@ -78,7 +78,7 @@
                 <ul>
                     <li v-for="(value, prop) in this.$store.getters.jsToPythonData" :key="value">
                         <p v-if= "prop === 'true' || prop === 'false' || prop === 'do'">&nbsp;&nbsp;&nbsp;{{value}}</p>
-                        <p v-else-if="prop!=='console'">{{ value }}</p>          
+                        <p v-else-if="prop !== 'console' && prop !== 'loop'">{{ value }}</p>          
                     </li>
                 </ul>
             </div>

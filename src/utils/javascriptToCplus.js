@@ -77,8 +77,8 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
         if (value.name === "for") {
             cCode = {
                 condition: `for(int i=${value.data.num1}; i<${value.data.num2}; i++) {`,
-                do: 'std::cout <<"\nhello world!";',
-                close: "}"
+                do: 'std::cout <<"\\nhello world!";',
+                close: "}",
             }
         }
         if(value.name === "nodeCondition") {
