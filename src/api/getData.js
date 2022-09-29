@@ -14,11 +14,10 @@ export const getData = async () => {
     });
 };
 
-
 function importNodeData(json) {
     const arrayDropdown = [];
     json.get.forEach((element, index) => {
-        arrayDropdown.push({id: index, name: element.uid, programName: element.programName});
+        arrayDropdown.push({id: index, uid: element.uid, programName: element.programName});
     });
     store.commit('setProgramOptions', arrayDropdown)
 }

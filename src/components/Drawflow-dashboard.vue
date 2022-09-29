@@ -7,7 +7,7 @@
             </button>
             <select className="w-32 bg-blue-400 mr-3 rounded-md hover:bg-blue-300 cursor-pointer" @click="getData()" @change="valueSelected($event)">
                     <option value="Select" className="text-center">Choose</option>
-                    <option v-for="j in store.getters.programOptionsData" :key="j.id" :value="j.id">{{`${j.programName}#${j.name}`}}</option>
+                    <option v-for="j in store.getters.programOptions" :key="j.id" :value="j.id">{{`${j.programName}#${j.uid}`}}</option>
             </select>
             <button className="w-32 bg-red-400 mr-3 rounded-md hover:bg-red-300" @click="deleteData(); cleanEditor(); getData()">Delete</button>
         </div>
@@ -15,7 +15,7 @@
         <div class="h-3/4 flex flex-row w-full">
             <div className="w-[200px] mx-auto p-2 text-sm">
                 <div class="nodes-list" draggable="true" v-for="i in nodesList" :key="i" :node-item="i.item" @dragstart="drag($event)">
-                    <span class="node" :style="`background: ${i.color}`">{{ i.name }}</span>
+                    <span class="node">{{ i.name }}</span>
                 </div>
             </div>
             <div className="drawflow-container w-full mx-2 relative">
@@ -60,7 +60,6 @@
     },
     setup() {
         const store = useStore();
-        const showNodes = shallowRef("");
         const optionSelected = shallowRef(0);
         const programName = shallowRef("");
         const editor = shallowRef({});
@@ -112,7 +111,7 @@
 
         const valueSelected = (event) => {
             optionSelected.value = event.target.value;
-            store.commit("setProgramId", store.getters.programOptionsData[optionSelected.value].name);
+            store.commit("setProgramUid", store.getters.programOptions[optionSelected.value].uid);
             showSelected();
         };
 
@@ -178,7 +177,7 @@
                                 updateNodeAssign(nodeAssignId, editor.value.getNodeFromId(nodeAssignId).data, result)
                             }
                         }
-                        updateNodeCondition(nodeData, inputNodeData, inputNodeName, nodeData.name);
+                        updateNodeCondition(nodeData, inputNodeData, nodeData.name);
 
                         javascriptToPython(variableName, editor.value.export(), num1, num2);
                         javascriptToJava(variableName, editor.value.export(), num1, num2);
@@ -207,7 +206,7 @@
                     variableName = inputNodeData.data.variable;
                     updateNodeAssign(inputNodeData.id, inputNodeData.data, result)
                 }
-                updateNodeCondition(outputData, inputNodeData, inputNodeName, conditionName);
+                updateNodeCondition(outputData, inputNodeData, conditionName);
 
                 javascriptToPython(variableName, editor.value.export(), num1, num2);
                 javascriptToJava(variableName, editor.value.export(), num1, num2);
@@ -266,18 +265,16 @@
             }
 
             const updateNodeAssign = (nodeId, nodeData, result) => {
-                const nodeAssignId = nodeId;
-                const nodeAssignData = nodeData;
-                editor.value.updateNodeDataFromId(nodeAssignId, {...nodeAssignData, assign: result});
+                editor.value.updateNodeDataFromId(nodeId, {...nodeData, assign: result});
             }
 
-            const updateNodeCondition = (outputData, inputNodeData, inputNodeName, conditionName) => {
-                if (inputNodeName === "nodeCondition" && conditionName === "if") {
+            const updateNodeCondition = (outputData, inputNodeData, conditionName) => {
+                if (conditionName === "if") {
                     const conditionResult = validationIf(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2), outputData.data.option);
                     const input_id = inputNodeData.id;
                     editor.value.updateNodeDataFromId(input_id, {conditionResult});
                 }
-                if (inputNodeName === "nodeCondition" && conditionName === "for") {
+                else if (conditionName === "for") {
                     const conditionResult = validationFor(parseFloat(outputData.data.num1), parseFloat(outputData.data.num2));
                     const input_id = inputNodeData.id;
                     editor.value.updateNodeDataFromId(input_id, {conditionResult});
@@ -294,6 +291,7 @@
             });
             return { programName: programName.value, nodesData };
         }
+
         const setData = async () => {
             fetch("http://localhost:5000/setAllPrograms", {
                 method: "POST",
@@ -302,10 +300,10 @@
                 },
                 body: JSON.stringify(editorData())
             })
-        };
+        }
+
         function showSelected() {
-            cleanEditor();
-            const validate = store.getters.jsImportData;
+            const validate = store.getters.jsImport;
             if (!!validate === true) {
                 const jsonOption = validate.get[optionSelected.value].nodesData;
                 const arrayOfNodesNew = [];
@@ -348,11 +346,10 @@
                         }
                     }
                 };
-                showNodes.value = ob;
-                editor.value.reroute = true;
-                editor.value.import(showNodes.value);
+                editor.value.import(ob);
             }
         }
+
         function cleanEditor() {
             editor.value.clear();
             store.commit("setJsToPython", "");
@@ -369,7 +366,6 @@
             drag,
             drop,
             allowDrop,
-            showNodes,
             getData,
             setData,
             valueSelected,

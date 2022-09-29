@@ -30,7 +30,7 @@ export function operationValues(num1, num2, nodeName, node) {
             result = number1 / number2;
             break;
         default:
-            console.log("No name");
+            console.log("Error with the operation");
     }
     return result;
 }

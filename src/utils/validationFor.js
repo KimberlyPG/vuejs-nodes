@@ -11,7 +11,6 @@ export function validationFor(num1, num2) {
         })
         num1++;
         result++;
-
     }
     message = `Executed: ${result} times`;
     store.commit('setJsToPythonBucle', jsonArr) 

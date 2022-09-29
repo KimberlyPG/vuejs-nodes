@@ -1,6 +1,6 @@
-export function validationIf(num1, num2, nodeName) {
+export function validationIf(num1, num2, option) {
     let result = 'false';
-    switch (nodeName) {
+    switch (option) {
         case "<":
             if (num1 < num2) {
                 result = 'true';

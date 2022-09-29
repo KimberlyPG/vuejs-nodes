@@ -7,7 +7,7 @@ const store = createStore({
         jsToPythonBucle: [],
         jsImport: {},
         programOptions: [],
-        programId: '',
+        programUid: '',
         jsToJava: '',
         jsToJavaPrintln: '',
         jsToCplus: '',
@@ -34,9 +34,9 @@ const store = createStore({
         {
             state.programOptions = value
         },
-        setProgramId(state, value) 
+        setProgramUid(state, value) 
         {
-            state.programId = value
+            state.programUid = value
         },
         setJsToJava(state, value) 
         {
@@ -67,14 +67,14 @@ const store = createStore({
             return  state.jsToPythonBucle
         }
         ,
-        jsImportData (state) {
+        jsImport (state) {
             return state.jsImport
         },
-        programOptionsData (state) {
+        programOptions (state) {
             return state.programOptions
         }, 
-        programIdData (state) {
-            return state.programId
+        programUid (state) {
+            return state.programUid
         },
         jsToJavaData (state) {
             return state.jsToJava

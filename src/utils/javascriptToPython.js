@@ -7,8 +7,6 @@ export function javascriptToPython(variableName, editor, num1, num2) {
     let total;
     let assignName = variableName;
     let pythonCode = '';
-    let pythonCodePrint = '';
-
     
     Object.entries(dataNodes).forEach(([, value]) => {
         if(value.name == 'addition' || value.name === 'subtraction' || value.name === 'multiplication' || value.name === 'division') {
@@ -89,6 +87,5 @@ export function javascriptToPython(variableName, editor, num1, num2) {
         }
 
         store.commit('setJsToPython', pythonCode);
-        store.commit('setJsToPythonPrint', pythonCodePrint);
     });
 }

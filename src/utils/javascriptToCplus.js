@@ -7,7 +7,6 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
     let total;
     let assignName = variableName;
     let cCode = '';
-    let cCodeCout = '';
 
     Object.entries(dataNodes).forEach(([, value]) => {
         if(value.name == 'addition' || value.name === 'subtraction' || value.name === 'multiplication' || value.name === 'division') {
@@ -81,7 +80,7 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
                 close: "}",
             }
         }
-        if(value.name === "nodeCondition") {
+        if (value.name === "nodeCondition") {
             if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {
                 cCode = {...cCode,
                     consoleResult: `${value.data.conditionResult}`
@@ -90,6 +89,5 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
         }
 
         store.commit('setJsToCplus', cCode);
-        store.commit('setJsToCplusCout', cCodeCout);
     });
 }
