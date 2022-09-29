@@ -9,7 +9,6 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
     let cCode = '';
     let cCodeCout = '';
 
-    
     Object.entries(dataNodes).forEach(([, value]) => {
         if(value.name == 'addition' || value.name === 'subtraction' || value.name === 'multiplication' || value.name === 'division') {
             if(value.inputs.input_1.connections.length > 0 && value.inputs.input_2.connections.length > 0) {
@@ -81,7 +80,6 @@ export function javascriptToCplus(variableName, editor, num1, num2) {
                 do: 'std::cout <<"\nhello world!";',
                 close: "}"
             }
-            // store.commit('setJsToCplus', '');
         }
         if(value.name === "nodeCondition") {
             if(value.data.conditionResult === "true" || value.data.conditionResult === "false") {

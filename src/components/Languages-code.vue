@@ -2,8 +2,8 @@
     <div className="python-container flex bg-white text-black w-1/4 mr-3">
         <button className="w-16 text-sm text-gray-500 hover:bg-yellow-400 focus:bg-yellow-400 rounded-sm" @click="toggle = 'python'">Python</button>
         <button className="w-16 text-sm text-gray-500 hover:bg-red-400 focus:bg-red-400 rounded-sm" @click="toggle = 'java'">Java</button>
-        <button className="w-16 text-sm text-gray-500 hover:bg-blue-400 focus:bg-blue-400 rounded-sm" @click="toggle = 'cPlus'">C++</button>
-        <div v-if="toggle === 'cPlus'">
+        <button className="w-16 text-sm text-gray-500 hover:bg-blue-400 focus:bg-blue-400 rounded-sm" @click="toggle = 'cPlusPlus'">C++</button>
+        <div v-if="toggle === 'cPlusPlus'">
             <div className="flex p-3">
                 <img 
                     className="w-8"
@@ -47,7 +47,7 @@
                 <ul>
                     <li v-for="(value, prop) in this.$store.getters.jsToJavaData" :key="value">
                         <p v-if= "prop === 'true' || prop === 'false' || prop === 'do'">&nbsp;&nbsp;&nbsp;{{value}}</p>
-                        <p v-else>{{ value }}</p>          
+                        <p v-else-if="prop!=='console'">{{ value }}</p>          
                     </li>
                 </ul>
             </div>
@@ -78,7 +78,7 @@
                 <ul>
                     <li v-for="(value, prop) in this.$store.getters.jsToPythonData" :key="value">
                         <p v-if= "prop === 'true' || prop === 'false' || prop === 'do'">&nbsp;&nbsp;&nbsp;{{value}}</p>
-                        <p v-else>{{ value }}</p>          
+                        <p v-else-if="prop!=='console'">{{ value }}</p>          
                     </li>
                 </ul>
             </div>

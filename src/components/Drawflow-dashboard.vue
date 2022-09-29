@@ -62,7 +62,7 @@
         const store = useStore();
         const showNodes = shallowRef("");
         const optionSelected = shallowRef(0);
-        const programName = shallowRef();
+        const programName = shallowRef("");
         const editor = shallowRef({});
 
         const Vue = { version: 3, h, render };
@@ -124,7 +124,7 @@
             if(nodeProgramName.length == 0) {
                 return alert("Name your program");
             }
-            else setData();
+            return setData();
         }
 
         onMounted(() => {
@@ -187,7 +187,6 @@
                 }
             });
             editor.value.on("connectionCreated", (data) => {
-                console.log(data);
                 const outputData = editor.value.getNodeFromId(data.output_id);
                 const outputNumber = parseFloat(outputData.data.number);
                 const output_class = data.input_class;
@@ -242,11 +241,11 @@
                     if (editorData[i].name === "addition" || editorData[i].name === "subtraction" || editorData[i].name === "division" || editorData[i].name === "multiplication") {
                         result = operationValues(num1, num2, editorData[i].name, editorData[i]);
                         const input_id = editorData[i].id;
-                        editor.value.updateNodeDataFromId(input_id, { result });
+                        editor.value.updateNodeDataFromId(input_id, {result});
                     }
                     if (editorData[i].name === "assign") {
                         variableName = editorData[i].data.variable;
-                        editor.value.updateNodeDataFromId(editorData[i].id, { ...editorData[i].data, assign: result });
+                        editor.value.updateNodeDataFromId(editorData[i].id, {...editorData[i].data, assign: result});
                     }
                     javascriptToPython(variableName, editor.value.export(), num1, num2);
                     javascriptToJava(variableName, editor.value.export(), num1, num2);
@@ -302,7 +301,7 @@
                     "Content-type": "application/json",
                 },
                 body: JSON.stringify(editorData())
-            });
+            })
         };
         function showSelected() {
             cleanEditor();
@@ -312,19 +311,19 @@
                 const arrayOfNodesNew = [];
                 jsonOption.forEach((value) => {
                     let newData;
-                    if (!!value.inputs === false) {
+                    if (!value.inputs) {
                         newData = {
                             ...value,
                             inputs: {}
                         };
                     }
-                    else if (!!value.outputs === false) {
+                    else if (!value.outputs) {
                         newData = {
                             ...value,
                             outputs: {}
                         };
                     }
-                    else if (!!value.data === false) {
+                    else if (!value.data) {
                         newData = {
                             ...value,
                             data: {}
@@ -357,10 +356,12 @@
         function cleanEditor() {
             editor.value.clear();
             store.commit("setJsToPython", "");
-            store.commit("setJsToPythonCount", "");
+            store.commit("setJsToPythonPrint", "");
             store.commit("setJsToPythonBucle", []);
             store.commit("setJsToJava", "");
             store.commit("setJsToJavaPrintln", "");
+            store.commit("setJsToCplus", "");
+            store.commit("setJsToCplusCout", "");
         }
 
         return {
